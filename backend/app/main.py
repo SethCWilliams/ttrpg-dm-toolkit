@@ -1,0 +1,35 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.database import engine, Base
+from app.auth import router as auth_router
+from app.campaigns import router as campaigns_router
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="DM Toolkit API",
+    description="A comprehensive dungeon master toolkit API",
+    version="1.0.0"
+)
+
+# CORS middleware for frontend communication
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Svelte dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(auth_router.router, prefix="/auth", tags=["authentication"])
+app.include_router(campaigns_router.router, prefix="/campaigns", tags=["campaigns"])
+
+@app.get("/")
+async def root():
+    return {"message": "DM Toolkit API"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}

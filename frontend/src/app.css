@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for the gothic theme */
+@layer base {
+  body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+  }
+  
+  .btn-primary {
+    @apply bg-red-600 text-white hover:bg-red-700;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-600 text-white hover:bg-gray-700;
+  }
+  
+  .btn-danger {
+    @apply bg-red-800 text-white hover:bg-red-900;
+  }
+  
+  .card {
+    @apply bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700;
+  }
+  
+  .input {
+    @apply bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-400 focus:border-red-500 focus:ring-1 focus:ring-red-500;
+  }
+  
+  .navbar {
+    @apply bg-gray-800 border-b border-gray-700;
+  }
+  
+  .sidebar {
+    @apply bg-gray-800 border-r border-gray-700;
+  }
+}

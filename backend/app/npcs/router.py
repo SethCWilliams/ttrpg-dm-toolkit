@@ -5,14 +5,14 @@ from app.database import get_db
 from app.models import NPC, Campaign, Location, User
 from app.schemas import (
     NPCCreate, NPCUpdate, NPC as NPCSchema, 
-    PaginatedResponse
+    PaginatedNPCResponse
 )
 from app.auth.router import get_current_user
 from app.campaigns.router import verify_campaign_access
 
 router = APIRouter()
 
-@router.get("/", response_model=PaginatedResponse)
+@router.get("/", response_model=PaginatedNPCResponse)
 async def get_npcs(
     campaign_id: int,
     current_user: User = Depends(get_current_user),
@@ -259,8 +259,107 @@ async def update_npc_relationships(
                     detail=f"Target NPC {rel.get('target_id')} not found in this campaign"
                 )
     
+    # Get the old relationships to determine what changed
+    old_relationships = npc.relationships or []
+    
+    # Update the NPC's relationships
     npc.relationships = relationships
+    # Force SQLAlchemy to detect the change to the JSON field
+    from sqlalchemy.orm.attributes import flag_modified
+    flag_modified(npc, 'relationships')
+    
+    # Handle bidirectional relationships
+    _update_bidirectional_relationships(db, campaign_id, npc_id, old_relationships, relationships)
+    
     db.commit()
     db.refresh(npc)
     
     return {"message": "Relationships updated successfully", "relationships": relationships}
+
+def _update_bidirectional_relationships(db: Session, campaign_id: int, source_npc_id: int, old_relationships: List[dict], new_relationships: List[dict]):
+    """Update bidirectional relationships when an NPC's relationships change."""
+    
+    # Create sets of target IDs for comparison
+    old_targets = {rel.get('target_id') for rel in old_relationships if rel.get('target_type') == 'npc' and rel.get('target_id')}
+    new_targets = {rel.get('target_id') for rel in new_relationships if rel.get('target_type') == 'npc' and rel.get('target_id')}
+    
+    # Find relationships that were added or removed
+    added_targets = new_targets - old_targets
+    removed_targets = old_targets - new_targets
+    
+    # Get source NPC info for reciprocal relationships
+    source_npc = db.query(NPC).filter(NPC.id == source_npc_id).first()
+    
+    # Add reciprocal relationships for new connections
+    for target_id in added_targets:
+        target_npc = db.query(NPC).filter(
+            NPC.id == target_id,
+            NPC.campaign_id == campaign_id
+        ).first()
+        
+        if target_npc:
+            # Find the relationship details from the new relationships
+            source_rel = next((rel for rel in new_relationships if rel.get('target_id') == target_id), None)
+            if source_rel:
+                # Create reciprocal relationship
+                target_relationships = target_npc.relationships or []
+                
+                # Check if reciprocal relationship already exists
+                existing_reciprocal = any(
+                    rel.get('target_id') == source_npc_id for rel in target_relationships
+                )
+                
+                if not existing_reciprocal:
+                    reciprocal_rel = {
+                        'target_id': source_npc_id,
+                        'target_type': 'npc',
+                        'target_name': source_npc.name,
+                        'target_occupation': source_npc.occupation,
+                        'relationship_type': _get_reciprocal_relationship_type(source_rel.get('relationship_type')),
+                        'description': f"Reciprocal relationship with {source_npc.name}",
+                        'strength': source_rel.get('strength', 'moderate'),
+                        'public_knowledge': source_rel.get('public_knowledge', False)
+                    }
+                    target_relationships.append(reciprocal_rel)
+                    target_npc.relationships = target_relationships
+    
+    # Remove reciprocal relationships for removed connections
+    for target_id in removed_targets:
+        target_npc = db.query(NPC).filter(
+            NPC.id == target_id,
+            NPC.campaign_id == campaign_id
+        ).first()
+        
+        if target_npc and target_npc.relationships:
+            # Remove reciprocal relationship
+            target_relationships = [
+                rel for rel in target_npc.relationships 
+                if rel.get('target_id') != source_npc_id
+            ]
+            target_npc.relationships = target_relationships
+
+def _get_reciprocal_relationship_type(relationship_type: str) -> str:
+    """Get the reciprocal relationship type."""
+    reciprocal_map = {
+        'family': 'family',
+        'friend': 'friend',
+        'ally': 'ally',
+        'romantic': 'romantic',
+        'mentor': 'student',
+        'student': 'mentor',
+        'enemy': 'enemy',
+        'rival': 'rival',
+        'employer': 'employee',
+        'employee': 'employer',
+        'neighbor': 'neighbor',
+        'acquaintance': 'acquaintance',
+        'business_partner': 'business_partner',
+        'creditor': 'debtor',
+        'debtor': 'creditor',
+        'protector': 'protected',
+        'protected': 'protector',
+        'blackmailer': 'victim',
+        'victim': 'blackmailer',
+        'other': 'other'
+    }
+    return reciprocal_map.get(relationship_type, 'other')

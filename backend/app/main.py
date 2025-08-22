@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 from app.auth import router as auth_router
 from app.campaigns import router as campaigns_router
+from app.npcs import router as npcs_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -25,6 +26,7 @@ app.add_middleware(
 # Include routers
 app.include_router(auth_router.router, prefix="/auth", tags=["authentication"])
 app.include_router(campaigns_router.router, prefix="/campaigns", tags=["campaigns"])
+app.include_router(npcs_router.router, prefix="/campaigns/{campaign_id}/npcs", tags=["npcs"])
 
 @app.get("/")
 async def root():

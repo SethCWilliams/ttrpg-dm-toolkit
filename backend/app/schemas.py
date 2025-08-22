@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Generic, TypeVar
 from datetime import datetime
 
 # User schemas
@@ -305,6 +305,13 @@ class Idea(IdeaBase):
         from_attributes = True
 
 # Pagination
-class PaginatedResponse(BaseModel):
+T = TypeVar('T')
+
+class PaginatedResponse(BaseModel, Generic[T]):
     total: int
-    items: List[Any]
+    items: List[T]
+
+# Specific paginated responses
+class PaginatedNPCResponse(BaseModel):
+    total: int
+    items: List['NPC']

@@ -103,17 +103,45 @@ export const campaignAPI = {
     }
 };
 
-// NPC API calls (placeholder for future implementation)
+// NPC API calls
 export const npcAPI = {
     async getNPCs(campaignId, params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiRequest(`/campaigns/${campaignId}/npcs?${query}`);
     },
 
+    async getNPC(campaignId, npcId) {
+        return apiRequest(`/campaigns/${campaignId}/npcs/${npcId}`);
+    },
+
     async createNPC(campaignId, npcData) {
         return apiRequest(`/campaigns/${campaignId}/npcs`, {
             method: 'POST',
             body: JSON.stringify(npcData)
+        });
+    },
+
+    async updateNPC(campaignId, npcId, npcData) {
+        return apiRequest(`/campaigns/${campaignId}/npcs/${npcId}`, {
+            method: 'PUT',
+            body: JSON.stringify(npcData)
+        });
+    },
+
+    async deleteNPC(campaignId, npcId) {
+        return apiRequest(`/campaigns/${campaignId}/npcs/${npcId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async getNPCRelationships(campaignId, npcId) {
+        return apiRequest(`/campaigns/${campaignId}/npcs/${npcId}/relationships`);
+    },
+
+    async updateNPCRelationships(campaignId, npcId, relationships) {
+        return apiRequest(`/campaigns/${campaignId}/npcs/${npcId}/relationships`, {
+            method: 'PUT',
+            body: JSON.stringify(relationships)
         });
     }
 };

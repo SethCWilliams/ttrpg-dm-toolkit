@@ -6,6 +6,7 @@
     import { npcAPI, campaignAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
     import EditNPCModal from '$lib/components/EditNPCModal.svelte';
+    import RelationshipManager from '$lib/components/RelationshipManager.svelte';
 
     let campaignId;
     let npcId;
@@ -13,6 +14,8 @@
     let loading = true;
     let error = '';
     let showEditModal = false;
+    let relationships = [];
+    let showRelationshipManager = false;
 
     onMount(async () => {
         if (!$auth.user) {
@@ -35,6 +38,7 @@
         }
 
         await loadNPC();
+        await loadRelationships();
     });
 
     async function loadNPC() {
@@ -48,9 +52,27 @@
         }
     }
 
+    async function loadRelationships() {
+        try {
+            const response = await npcAPI.getNPCRelationships(campaignId, npcId);
+            relationships = response.relationships || [];
+        } catch (err) {
+            console.error('Failed to load relationships:', err);
+        }
+    }
+
     function handleNPCUpdated() {
         showEditModal = false;
         loadNPC();
+    }
+
+    function handleRelationshipsSaved(event) {
+        relationships = event.detail.relationships;
+        showRelationshipManager = false;
+        // Update the NPC object with the new relationships
+        if (npc) {
+            npc.relationships = relationships;
+        }
     }
 
     async function handleDelete() {
@@ -278,15 +300,48 @@
             <!-- Sidebar -->
             <div class="space-y-6">
                 <!-- Relationships -->
-                {#if npc.relationships && npc.relationships.length > 0}
-                    <div class="card">
-                        <h2 class="text-lg font-semibold text-white mb-4">Relationships</h2>
+                <div class="card">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-white">Relationships</h2>
+                        <button
+                            on:click={() => showRelationshipManager = !showRelationshipManager}
+                            class="btn btn-sm {showRelationshipManager ? 'btn-secondary' : 'btn-primary'}"
+                        >
+                            {showRelationshipManager ? 'View' : 'Manage'}
+                        </button>
+                    </div>
+                    
+                    {#if showRelationshipManager}
+                        <RelationshipManager
+                            {campaignId}
+                            {npcId}
+                            npcName={npc.name}
+                            initialRelationships={relationships}
+                            on:saved={handleRelationshipsSaved}
+                        />
+                    {:else if relationships.length > 0}
                         <div class="space-y-3">
-                            {#each npc.relationships as relationship}
+                            {#each relationships as relationship}
                                 <div class="border-l-4 border-red-600 pl-3">
-                                    <div class="text-sm font-medium text-gray-300">
-                                        {relationship.relationship_type}
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <span class="text-sm font-medium text-gray-300">
+                                            {relationship.target_name || `NPC #${relationship.target_id}`}
+                                        </span>
+                                        <span class="text-xs text-gray-500">
+                                            ({relationship.relationship_type})
+                                        </span>
+                                        <span class="text-xs text-gray-400 capitalize">
+                                            {relationship.strength}
+                                        </span>
+                                        {#if relationship.public_knowledge}
+                                            <span class="text-xs text-blue-400" title="Public Knowledge">👁️</span>
+                                        {/if}
                                     </div>
+                                    {#if relationship.target_occupation}
+                                        <div class="text-xs text-gray-500 mb-1">
+                                            {relationship.target_occupation}
+                                        </div>
+                                    {/if}
                                     {#if relationship.description}
                                         <div class="text-sm text-gray-400">
                                             {relationship.description}
@@ -295,8 +350,19 @@
                                 </div>
                             {/each}
                         </div>
-                    </div>
-                {/if}
+                    {:else}
+                        <div class="text-center py-4 text-gray-500">
+                            <div class="text-2xl mb-2">👥</div>
+                            <p class="text-sm">No relationships yet</p>
+                            <button
+                                on:click={() => showRelationshipManager = true}
+                                class="btn btn-primary btn-sm mt-2"
+                            >
+                                Add Relationships
+                            </button>
+                        </div>
+                    {/if}
+                </div>
 
                 <!-- Game Stats -->
                 {#if npc.stats}

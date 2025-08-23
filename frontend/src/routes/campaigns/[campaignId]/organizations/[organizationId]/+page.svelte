@@ -5,6 +5,7 @@
     import { currentCampaign } from '$lib/stores/campaigns.js';
     import { organizationAPI, campaignAPI, npcAPI, locationAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
+    import EditOrganizationModal from '$lib/components/EditOrganizationModal.svelte';
 
     let campaignId;
     let organizationId;
@@ -14,6 +15,7 @@
     let members = [];
     let loading = true;
     let error = '';
+    let showEditModal = false;
 
     onMount(async () => {
         if (!$auth.user) {
@@ -98,6 +100,24 @@
             goto(`/campaigns/${campaignId}/organizations`);
         } catch (err) {
             alert('Failed to delete organization: ' + err.message);
+        }
+    }
+
+    function handleOrganizationUpdated(event) {
+        showEditModal = false;
+        organization = event.detail.organization;
+        // Reload related data in case relationships changed
+        loadRelatedData();
+    }
+
+    // Get available parent locations for the edit modal
+    async function getAvailableParents() {
+        try {
+            const response = await locationAPI.getLocations(campaignId, { limit: 100 });
+            return response.items || [];
+        } catch (err) {
+            console.error('Failed to load parent locations:', err);
+            return [];
         }
     }
 
@@ -241,6 +261,7 @@
                 
                 <div class="flex items-center space-x-3">
                     <button
+                        on:click={() => showEditModal = true}
                         class="btn btn-secondary"
                     >
                         Edit
@@ -420,3 +441,13 @@
         </div>
     {/if}
 </div>
+
+<!-- Edit Organization Modal -->
+{#if showEditModal && organization}
+    <EditOrganizationModal
+        {campaignId}
+        {organization}
+        on:updated={handleOrganizationUpdated}
+        on:close={() => showEditModal = false}
+    />
+{/if}

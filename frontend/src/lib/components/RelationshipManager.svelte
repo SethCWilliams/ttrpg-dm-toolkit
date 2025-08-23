@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher, onMount } from 'svelte';
-    import { npcAPI } from '$lib/api.js';
+    import { npcAPI, locationAPI } from '$lib/api.js';
 
     export let campaignId;
     export let npcId;
@@ -11,6 +11,7 @@
 
     let relationships = [];
     let availableNPCs = [];
+    let availableLocations = [];
     let loading = false;
     let saving = false;
     let error = '';
@@ -26,12 +27,23 @@
         public_knowledge: false
     };
 
-    const relationshipTypes = [
+    const npcRelationshipTypes = [
         'family', 'friend', 'ally', 'romantic', 'mentor', 'student',
         'enemy', 'rival', 'employer', 'employee', 'neighbor', 'acquaintance',
         'business_partner', 'creditor', 'debtor', 'protector', 'protected',
         'blackmailer', 'victim', 'other'
     ];
+
+    const locationRelationshipTypes = [
+        'lives_in', 'works_at', 'owns', 'frequents', 'avoids', 'born_in',
+        'exiled_from', 'wants_to_visit', 'has_history_with', 'protects',
+        'seeks_to_destroy', 'hiding_in', 'imprisoned_in', 'rules', 'serves',
+        'trades_with', 'studies_at', 'worships_at', 'performs_at', 'other'
+    ];
+
+    $: currentRelationshipTypes = newRelationship.target_type === 'location' 
+        ? locationRelationshipTypes 
+        : npcRelationshipTypes;
 
     const strengthLevels = [
         { value: 'weak', label: 'Weak' },
@@ -42,6 +54,7 @@
     onMount(async () => {
         relationships = [...initialRelationships];
         await loadAvailableNPCs();
+        await loadAvailableLocations();
     });
 
     async function loadAvailableNPCs() {
@@ -55,6 +68,16 @@
             error = `Failed to load available NPCs: ${err.message || err}`;
         } finally {
             loading = false;
+        }
+    }
+
+    async function loadAvailableLocations() {
+        try {
+            const response = await locationAPI.getLocations(campaignId, { limit: 100 });
+            availableLocations = response.items || [];
+        } catch (err) {
+            console.error('Failed to load locations:', err);
+            error = `Failed to load available locations: ${err.message || err}`;
         }
     }
 
@@ -88,13 +111,20 @@
             return;
         }
 
-        const targetNPC = availableNPCs.find(npc => npc.id == newRelationship.target_id);
-        const relationship = {
+        let relationship = {
             ...newRelationship,
-            target_id: parseInt(newRelationship.target_id),
-            target_name: targetNPC?.name,
-            target_occupation: targetNPC?.occupation
+            target_id: parseInt(newRelationship.target_id)
         };
+
+        if (newRelationship.target_type === 'npc') {
+            const targetNPC = availableNPCs.find(npc => npc.id == newRelationship.target_id);
+            relationship.target_name = targetNPC?.name;
+            relationship.target_occupation = targetNPC?.occupation;
+        } else if (newRelationship.target_type === 'location') {
+            const targetLocation = availableLocations.find(loc => loc.id == newRelationship.target_id);
+            relationship.target_name = targetLocation?.name;
+            relationship.target_location_type = targetLocation?.type;
+        }
 
         relationships = [...relationships, relationship];
         cancelAddRelationship();
@@ -130,21 +160,46 @@
         }
     }
 
-    function getRelationshipIcon(type) {
-        switch (type) {
-            case 'family': return '👨‍👩‍👧‍👦';
-            case 'friend': return '🤝';
-            case 'ally': return '🤜🤛';
-            case 'romantic': return '💕';
-            case 'mentor': return '👨‍🏫';
-            case 'student': return '🎓';
-            case 'enemy': return '⚔️';
-            case 'rival': return '🥊';
-            case 'employer': return '👔';
-            case 'employee': return '👷';
-            case 'business_partner': return '💼';
-            case 'neighbor': return '🏠';
-            default: return '👤';
+    function getRelationshipIcon(type, targetType) {
+        if (targetType === 'location') {
+            switch (type) {
+                case 'lives_in': return '🏠';
+                case 'works_at': return '💼';
+                case 'owns': return '🏛️';
+                case 'frequents': return '🚶';
+                case 'avoids': return '🚫';
+                case 'born_in': return '👶';
+                case 'exiled_from': return '⛓️';
+                case 'wants_to_visit': return '🎯';
+                case 'has_history_with': return '📜';
+                case 'protects': return '🛡️';
+                case 'seeks_to_destroy': return '💥';
+                case 'hiding_in': return '🕵️';
+                case 'imprisoned_in': return '⛓️';
+                case 'rules': return '👑';
+                case 'serves': return '🤝';
+                case 'trades_with': return '💰';
+                case 'studies_at': return '📚';
+                case 'worships_at': return '🙏';
+                case 'performs_at': return '🎭';
+                default: return '📍';
+            }
+        } else {
+            switch (type) {
+                case 'family': return '👨‍👩‍👧‍👦';
+                case 'friend': return '🤝';
+                case 'ally': return '🤜🤛';
+                case 'romantic': return '💕';
+                case 'mentor': return '👨‍🏫';
+                case 'student': return '🎓';
+                case 'enemy': return '⚔️';
+                case 'rival': return '🥊';
+                case 'employer': return '👔';
+                case 'employee': return '👷';
+                case 'business_partner': return '💼';
+                case 'neighbor': return '🏠';
+                default: return '👤';
+            }
         }
     }
 
@@ -185,7 +240,7 @@
                     <div class="flex items-start justify-between">
                         <div class="flex items-start space-x-3 flex-1">
                             <div class="text-2xl">
-                                {getRelationshipIcon(relationship.relationship_type)}
+                                {getRelationshipIcon(relationship.relationship_type, relationship.target_type)}
                             </div>
                             
                             <div class="flex-1">
@@ -207,6 +262,10 @@
                                 {#if relationship.target_occupation}
                                     <div class="text-sm text-gray-500 mb-1">
                                         {relationship.target_occupation}
+                                    </div>
+                                {:else if relationship.target_location_type}
+                                    <div class="text-sm text-gray-500 mb-1">
+                                        {relationship.target_location_type.charAt(0).toUpperCase() + relationship.target_location_type.slice(1)}
                                     </div>
                                 {/if}
                                 
@@ -250,24 +309,50 @@
             <h4 class="font-medium text-white mb-4">Add New Relationship</h4>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Target Type Selection -->
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
-                        Target NPC <span class="text-red-400">*</span>
+                        Relationship With <span class="text-red-400">*</span>
+                    </label>
+                    <select
+                        bind:value={newRelationship.target_type}
+                        class="input w-full"
+                        on:change={() => { newRelationship.target_id = ''; newRelationship.relationship_type = ''; }}
+                    >
+                        <option value="npc">NPC</option>
+                        <option value="location">Location</option>
+                    </select>
+                </div>
+
+                <!-- Target Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Select {newRelationship.target_type === 'location' ? 'Location' : 'NPC'} <span class="text-red-400">*</span>
                     </label>
                     <select
                         bind:value={newRelationship.target_id}
                         class="input w-full"
                         required
                     >
-                        <option value="">Select an NPC...</option>
-                        {#each availableNPCs as npc}
-                            <option value={npc.id}>
-                                {npc.name} {npc.occupation ? `(${npc.occupation})` : ''}
-                            </option>
-                        {/each}
+                        {#if newRelationship.target_type === 'location'}
+                            <option value="">Select a location...</option>
+                            {#each availableLocations as location}
+                                <option value={location.id}>
+                                    {location.name} ({location.type})
+                                </option>
+                            {/each}
+                        {:else}
+                            <option value="">Select an NPC...</option>
+                            {#each availableNPCs as npc}
+                                <option value={npc.id}>
+                                    {npc.name} {npc.occupation ? `(${npc.occupation})` : ''}
+                                </option>
+                            {/each}
+                        {/if}
                     </select>
                 </div>
 
+                <!-- Relationship Type -->
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
                         Relationship Type <span class="text-red-400">*</span>
@@ -278,8 +363,8 @@
                         required
                     >
                         <option value="">Select type...</option>
-                        {#each relationshipTypes as type}
-                            <option value={type}>{type.replace('_', ' ')}</option>
+                        {#each currentRelationshipTypes as type}
+                            <option value={type}>{type.replace(/_/g, ' ')}</option>
                         {/each}
                     </select>
                 </div>

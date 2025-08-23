@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.database import get_db
 from app.models import NPC, Campaign, Location, User
+from sqlalchemy.orm.attributes import flag_modified
 from app.schemas import (
     NPCCreate, NPCUpdate, NPC as NPCSchema, 
     PaginatedNPCResponse
@@ -265,7 +266,6 @@ async def update_npc_relationships(
     # Update the NPC's relationships
     npc.relationships = relationships
     # Force SQLAlchemy to detect the change to the JSON field
-    from sqlalchemy.orm.attributes import flag_modified
     flag_modified(npc, 'relationships')
     
     # Handle bidirectional relationships
@@ -279,19 +279,25 @@ async def update_npc_relationships(
 def _update_bidirectional_relationships(db: Session, campaign_id: int, source_npc_id: int, old_relationships: List[dict], new_relationships: List[dict]):
     """Update bidirectional relationships when an NPC's relationships change."""
     
-    # Create sets of target IDs for comparison
-    old_targets = {rel.get('target_id') for rel in old_relationships if rel.get('target_type') == 'npc' and rel.get('target_id')}
-    new_targets = {rel.get('target_id') for rel in new_relationships if rel.get('target_type') == 'npc' and rel.get('target_id')}
+    # Create sets of target IDs for comparison (NPCs and Locations separately)
+    old_npc_targets = {rel.get('target_id') for rel in old_relationships if rel.get('target_type') == 'npc' and rel.get('target_id')}
+    new_npc_targets = {rel.get('target_id') for rel in new_relationships if rel.get('target_type') == 'npc' and rel.get('target_id')}
+    
+    old_location_targets = {rel.get('target_id') for rel in old_relationships if rel.get('target_type') == 'location' and rel.get('target_id')}
+    new_location_targets = {rel.get('target_id') for rel in new_relationships if rel.get('target_type') == 'location' and rel.get('target_id')}
     
     # Find relationships that were added or removed
-    added_targets = new_targets - old_targets
-    removed_targets = old_targets - new_targets
+    added_npc_targets = new_npc_targets - old_npc_targets
+    removed_npc_targets = old_npc_targets - new_npc_targets
+    
+    added_location_targets = new_location_targets - old_location_targets
+    removed_location_targets = old_location_targets - new_location_targets
     
     # Get source NPC info for reciprocal relationships
     source_npc = db.query(NPC).filter(NPC.id == source_npc_id).first()
     
-    # Add reciprocal relationships for new connections
-    for target_id in added_targets:
+    # Add reciprocal NPC relationships for new connections
+    for target_id in added_npc_targets:
         target_npc = db.query(NPC).filter(
             NPC.id == target_id,
             NPC.campaign_id == campaign_id
@@ -323,8 +329,42 @@ def _update_bidirectional_relationships(db: Session, campaign_id: int, source_np
                     target_relationships.append(reciprocal_rel)
                     target_npc.relationships = target_relationships
     
-    # Remove reciprocal relationships for removed connections
-    for target_id in removed_targets:
+    # Add reciprocal Location relationships for new connections
+    for target_id in added_location_targets:
+        target_location = db.query(Location).filter(
+            Location.id == target_id,
+            Location.campaign_id == campaign_id
+        ).first()
+        
+        if target_location:
+            # Find the relationship details from the new relationships
+            source_rel = next((rel for rel in new_relationships if rel.get('target_id') == target_id and rel.get('target_type') == 'location'), None)
+            if source_rel:
+                # Create reciprocal relationship on location
+                target_relationships = target_location.relationships or []
+                
+                # Check if reciprocal relationship already exists
+                existing_reciprocal = any(
+                    rel.get('target_id') == source_npc_id and rel.get('target_type') == 'npc' for rel in target_relationships
+                )
+                
+                if not existing_reciprocal:
+                    reciprocal_rel = {
+                        'target_id': source_npc_id,
+                        'target_type': 'npc',
+                        'target_name': source_npc.name,
+                        'target_occupation': source_npc.occupation,
+                        'relationship_type': _get_reciprocal_location_relationship_type(source_rel.get('relationship_type')),
+                        'description': f"Connected to {source_npc.name}",
+                        'strength': source_rel.get('strength', 'moderate'),
+                        'public_knowledge': source_rel.get('public_knowledge', False)
+                    }
+                    target_relationships.append(reciprocal_rel)
+                    target_location.relationships = target_relationships
+                    flag_modified(target_location, 'relationships')
+    
+    # Remove reciprocal NPC relationships for removed connections
+    for target_id in removed_npc_targets:
         target_npc = db.query(NPC).filter(
             NPC.id == target_id,
             NPC.campaign_id == campaign_id
@@ -337,6 +377,22 @@ def _update_bidirectional_relationships(db: Session, campaign_id: int, source_np
                 if rel.get('target_id') != source_npc_id
             ]
             target_npc.relationships = target_relationships
+    
+    # Remove reciprocal Location relationships for removed connections
+    for target_id in removed_location_targets:
+        target_location = db.query(Location).filter(
+            Location.id == target_id,
+            Location.campaign_id == campaign_id
+        ).first()
+        
+        if target_location and target_location.relationships:
+            # Remove reciprocal relationship
+            target_relationships = [
+                rel for rel in target_location.relationships 
+                if not (rel.get('target_id') == source_npc_id and rel.get('target_type') == 'npc')
+            ]
+            target_location.relationships = target_relationships
+            flag_modified(target_location, 'relationships')
 
 def _get_reciprocal_relationship_type(relationship_type: str) -> str:
     """Get the reciprocal relationship type."""
@@ -363,3 +419,29 @@ def _get_reciprocal_relationship_type(relationship_type: str) -> str:
         'other': 'other'
     }
     return reciprocal_map.get(relationship_type, 'other')
+
+def _get_reciprocal_location_relationship_type(relationship_type: str) -> str:
+    """Get the reciprocal relationship type for location relationships."""
+    reciprocal_map = {
+        'lives_in': 'inhabitant',
+        'works_at': 'workplace_for',
+        'owns': 'owned_by',
+        'frequents': 'frequently_visited_by',
+        'avoids': 'avoided_by',
+        'born_in': 'birthplace_of',
+        'exiled_from': 'exiled',
+        'wants_to_visit': 'desired_destination_of',
+        'has_history_with': 'connected_to',
+        'protects': 'protected_by',
+        'seeks_to_destroy': 'threatened_by',
+        'hiding_in': 'hiding_place_for',
+        'imprisoned_in': 'imprisons',
+        'rules': 'ruled_by',
+        'serves': 'served_by',
+        'trades_with': 'trades_with',
+        'studies_at': 'place_of_study_for',
+        'worships_at': 'place_of_worship_for',
+        'performs_at': 'performance_venue_for',
+        'other': 'connected_to'
+    }
+    return reciprocal_map.get(relationship_type, 'connected_to')

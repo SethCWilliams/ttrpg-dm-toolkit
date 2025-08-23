@@ -315,3 +315,7 @@ class PaginatedResponse(BaseModel, Generic[T]):
 class PaginatedNPCResponse(BaseModel):
     total: int
     items: List['NPC']
+
+class PaginatedLocationResponse(BaseModel):
+    total: int
+    items: List['Location']

@@ -146,11 +146,15 @@ export const npcAPI = {
     }
 };
 
-// Location API calls (placeholder for future implementation)
+// Location API calls
 export const locationAPI = {
     async getLocations(campaignId, params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiRequest(`/campaigns/${campaignId}/locations?${query}`);
+    },
+
+    async getLocation(campaignId, locationId) {
+        return apiRequest(`/campaigns/${campaignId}/locations/${locationId}`);
     },
 
     async createLocation(campaignId, locationData) {
@@ -158,5 +162,22 @@ export const locationAPI = {
             method: 'POST',
             body: JSON.stringify(locationData)
         });
+    },
+
+    async updateLocation(campaignId, locationId, locationData) {
+        return apiRequest(`/campaigns/${campaignId}/locations/${locationId}`, {
+            method: 'PUT',
+            body: JSON.stringify(locationData)
+        });
+    },
+
+    async deleteLocation(campaignId, locationId) {
+        return apiRequest(`/campaigns/${campaignId}/locations/${locationId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async getLocationTemplateFields(campaignId) {
+        return apiRequest(`/campaigns/${campaignId}/locations/templates/fields`);
     }
 };

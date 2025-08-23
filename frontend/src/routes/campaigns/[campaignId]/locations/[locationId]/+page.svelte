@@ -3,7 +3,7 @@
     import { page } from '$app/stores';
     import { auth } from '$lib/stores/auth.js';
     import { currentCampaign } from '$lib/stores/campaigns.js';
-    import { locationAPI, campaignAPI, npcAPI } from '$lib/api.js';
+    import { locationAPI, campaignAPI, npcAPI, organizationAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
     import EditLocationModal from '$lib/components/EditLocationModal.svelte';
 
@@ -11,6 +11,7 @@
     let locationId;
     let location = null;
     let relatedNPCs = [];
+    let relatedOrganizations = [];
     let childLocations = [];
     let parentLocation = null;
     let loading = true;
@@ -63,6 +64,10 @@
             // Load child locations
             const childResponse = await locationAPI.getLocations(campaignId, { parent_location_id: locationId, limit: 100 });
             childLocations = childResponse.items || [];
+
+            // Load organizations with this as headquarters
+            const orgResponse = await organizationAPI.getOrganizations(campaignId, { headquarters_location_id: locationId, limit: 100 });
+            relatedOrganizations = orgResponse.items || [];
 
             // Load parent location if exists
             if (location.parent_location_id) {
@@ -156,6 +161,19 @@
     function capitalizeWords(str) {
         if (!str) return '';
         return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function getOrganizationIcon(type) {
+        switch (type) {
+            case 'guild': return '🏛️';
+            case 'government': return '🏛️';
+            case 'religion': return '⛪';
+            case 'criminal': return '🗡️';
+            case 'military': return '⚔️';
+            case 'academic': return '📚';
+            case 'merchant': return '💰';
+            default: return '🏢';
+        }
     }
 </script>
 
@@ -388,6 +406,29 @@
                                     {#if npc.occupation}
                                         <div class="text-xs text-gray-400">{npc.occupation}</div>
                                     {/if}
+                                </a>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+
+                <!-- Organizations Based Here -->
+                {#if relatedOrganizations.length > 0}
+                    <div class="card">
+                        <h2 class="text-lg font-semibold text-white mb-4">Organizations</h2>
+                        <div class="space-y-3">
+                            {#each relatedOrganizations as org}
+                                <a
+                                    href="/campaigns/{campaignId}/organizations/{org.id}"
+                                    class="block p-3 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+                                >
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <span class="text-lg">{getOrganizationIcon(org.type)}</span>
+                                        <div class="text-sm font-medium text-white">{org.name}</div>
+                                    </div>
+                                    <div class="text-xs text-gray-400 capitalize">
+                                        {org.type} • {org.scope || 'local'} scope
+                                    </div>
                                 </a>
                             {/each}
                         </div>

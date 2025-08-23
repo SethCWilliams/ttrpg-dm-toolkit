@@ -24,7 +24,8 @@ async def get_organizations(
     type: Optional[str] = Query(None),
     scope: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
-    visibility: Optional[str] = Query(None)
+    visibility: Optional[str] = Query(None),
+    headquarters_location_id: Optional[int] = Query(None)
 ):
     """Get organizations for a campaign with optional filtering."""
     query = db.query(Organization).filter(Organization.campaign_id == campaign_id)
@@ -49,6 +50,9 @@ async def get_organizations(
         
     if visibility:
         query = query.filter(Organization.visibility == visibility)
+    
+    if headquarters_location_id:
+        query = query.filter(Organization.headquarters_location_id == headquarters_location_id)
     
     # Get total count
     total = query.count()

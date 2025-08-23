@@ -3,7 +3,7 @@
     import { page } from '$app/stores';
     import { auth } from '$lib/stores/auth.js';
     import { currentCampaign } from '$lib/stores/campaigns.js';
-    import { campaignAPI, npcAPI, locationAPI } from '$lib/api.js';
+    import { campaignAPI, npcAPI, locationAPI, organizationAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
 
     let campaignId;
@@ -35,17 +35,21 @@
             campaign = await campaignAPI.getCampaign(campaignId);
             currentCampaign.set(campaign);
             
-            // Update stats from the campaign data
-            if (campaign.stats) {
-                stats = {
-                    npcs: campaign.stats.npc_count || 0,
-                    locations: campaign.stats.location_count || 0,
-                    organizations: campaign.stats.organization_count || 0,
-                    plotHooks: campaign.stats.plot_hook_count || 0,
-                    events: campaign.stats.event_count || 0,
-                    items: campaign.stats.item_count || 0
-                };
-            }
+            // Load actual stats
+            const [npcResponse, locationResponse, organizationResponse] = await Promise.all([
+                npcAPI.getNPCs(campaignId, { limit: 1 }),
+                locationAPI.getLocations(campaignId, { limit: 1 }),
+                organizationAPI.getOrganizations(campaignId, { limit: 1 })
+            ]);
+            
+            stats = {
+                npcs: npcResponse.total || 0,
+                locations: locationResponse.total || 0,
+                organizations: organizationResponse.total || 0,
+                plotHooks: 0, // TODO: implement
+                events: 0, // TODO: implement
+                items: 0 // TODO: implement
+            };
         } catch (err) {
             error = err.message || 'Failed to load campaign';
         } finally {
@@ -136,11 +140,10 @@
                 <p class="text-2xl font-bold text-red-500">{stats.locations}</p>
             </a>
             
-            <div class="card text-center opacity-60">
+            <a href="/campaigns/{campaignId}/organizations" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Organizations</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.organizations}</p>
-                <p class="text-xs text-gray-600 mt-1">Coming Soon</p>
-            </div>
+            </a>
             
             <div class="card text-center opacity-60">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Plot Hooks</h3>
@@ -188,6 +191,20 @@
                     <div>
                         <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Manage Locations</h3>
                         <p class="text-gray-400">Build your world's geography</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/campaigns/{campaignId}/organizations" class="card hover:bg-gray-750 transition-colors group">
+                <div class="flex items-center">
+                    <div class="bg-red-600 p-3 rounded-lg mr-4">
+                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Manage Organizations</h3>
+                        <p class="text-gray-400">Guilds, governments, and factions</p>
                     </div>
                 </div>
             </a>

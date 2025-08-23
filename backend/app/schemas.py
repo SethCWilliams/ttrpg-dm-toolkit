@@ -319,3 +319,60 @@ class PaginatedNPCResponse(BaseModel):
 class PaginatedLocationResponse(BaseModel):
     total: int
     items: List['Location']
+
+# Organization schemas
+class OrganizationBase(BaseModel):
+    name: str
+    type: Optional[str] = None
+    scope: Optional[str] = None
+    headquarters_location_id: Optional[int] = None
+    leader_npc_id: Optional[int] = None
+    goals: Optional[List[str]] = []
+    methods: Optional[List[str]] = []
+    resources: Optional[str] = None
+    influence_level: Optional[str] = None
+    membership_size: Optional[str] = None
+    notable_members: Optional[List[int]] = []
+    allies: Optional[List[int]] = []
+    enemies: Optional[List[int]] = []
+    reputation: Optional[str] = None
+    status: Optional[str] = "draft"
+    visibility: Optional[str] = "dm_only"
+    symbol_image_path: Optional[str] = None
+    notes: Optional[str] = None
+
+class OrganizationCreate(OrganizationBase):
+    pass
+
+class OrganizationUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    scope: Optional[str] = None
+    headquarters_location_id: Optional[int] = None
+    leader_npc_id: Optional[int] = None
+    goals: Optional[List[str]] = None
+    methods: Optional[List[str]] = None
+    resources: Optional[str] = None
+    influence_level: Optional[str] = None
+    membership_size: Optional[str] = None
+    notable_members: Optional[List[int]] = None
+    allies: Optional[List[int]] = None
+    enemies: Optional[List[int]] = None
+    reputation: Optional[str] = None
+    status: Optional[str] = None
+    visibility: Optional[str] = None
+    symbol_image_path: Optional[str] = None
+    notes: Optional[str] = None
+
+class Organization(OrganizationBase):
+    id: int
+    campaign_id: int
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class PaginatedOrganizationResponse(BaseModel):
+    total: int
+    items: List['Organization']

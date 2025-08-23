@@ -181,3 +181,39 @@ export const locationAPI = {
         return apiRequest(`/campaigns/${campaignId}/locations/templates/fields`);
     }
 };
+
+// Organization API calls
+export const organizationAPI = {
+    async getOrganizations(campaignId, params = {}) {
+        const query = new URLSearchParams(params).toString();
+        return apiRequest(`/campaigns/${campaignId}/organizations?${query}`);
+    },
+
+    async getOrganization(campaignId, organizationId) {
+        return apiRequest(`/campaigns/${campaignId}/organizations/${organizationId}`);
+    },
+
+    async createOrganization(campaignId, organizationData) {
+        return apiRequest(`/campaigns/${campaignId}/organizations`, {
+            method: 'POST',
+            body: JSON.stringify(organizationData)
+        });
+    },
+
+    async updateOrganization(campaignId, organizationId, organizationData) {
+        return apiRequest(`/campaigns/${campaignId}/organizations/${organizationId}`, {
+            method: 'PUT',
+            body: JSON.stringify(organizationData)
+        });
+    },
+
+    async deleteOrganization(campaignId, organizationId) {
+        return apiRequest(`/campaigns/${campaignId}/organizations/${organizationId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async getOrganizationTemplateFields() {
+        return apiRequest('/campaigns/0/organizations/templates/fields');
+    }
+};

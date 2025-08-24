@@ -70,13 +70,15 @@
         try {
             loading = true;
             const params = {
-                search: searchQuery || undefined,
-                hook_type: selectedType || undefined,
-                status: selectedStatus || undefined,
-                urgency: selectedUrgency || undefined,
-                complexity: selectedComplexity || undefined,
                 limit: 100
             };
+            
+            // Only add parameters that have actual values
+            if (searchQuery) params.search = searchQuery;
+            if (selectedType) params.hook_type = selectedType;
+            if (selectedStatus) params.status = selectedStatus;
+            if (selectedUrgency) params.urgency = selectedUrgency;
+            if (selectedComplexity) params.complexity = selectedComplexity;
             
             const response = await plotHookAPI.getPlotHooks(campaignId, params);
             plotHooks = response.items || [];

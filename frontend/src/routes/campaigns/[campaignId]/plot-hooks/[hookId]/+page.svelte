@@ -5,6 +5,7 @@
     import { currentCampaign } from '$lib/stores/campaigns.js';
     import { plotHookAPI, npcAPI, locationAPI, organizationAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
+    import EditPlotHookModal from '$lib/components/EditPlotHookModal.svelte';
 
     let campaignId;
     let hookId;
@@ -14,6 +15,7 @@
     let relatedOrganizations = [];
     let loading = true;
     let error = '';
+    let showEditModal = false;
 
     onMount(async () => {
         if (!$auth.user) {
@@ -123,6 +125,17 @@
             day: 'numeric'
         });
     }
+
+    function handlePlotHookUpdated(event) {
+        plotHook = event.detail.plotHook;
+        showEditModal = false;
+        // Reload related entities in case they changed
+        loadRelatedEntities();
+    }
+
+    function handleModalClose() {
+        showEditModal = false;
+    }
 </script>
 
 <svelte:head>
@@ -195,7 +208,10 @@
                 </div>
                 
                 <div class="flex space-x-3">
-                    <button class="btn btn-secondary">
+                    <button 
+                        on:click={() => showEditModal = true}
+                        class="btn btn-secondary"
+                    >
                         <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
@@ -391,3 +407,12 @@
         </div>
     {/if}
 </div>
+
+{#if showEditModal && plotHook}
+    <EditPlotHookModal 
+        {campaignId}
+        {plotHook}
+        on:updated={handlePlotHookUpdated}
+        on:close={handleModalClose}
+    />
+{/if}

@@ -254,6 +254,76 @@ export const itemAPI = {
     }
 };
 
+// Event API calls
+export const eventAPI = {
+    async getEvents(campaignId, params = {}) {
+        const query = new URLSearchParams(params).toString();
+        return apiRequest(`/campaigns/${campaignId}/events?${query}`);
+    },
+
+    async getEvent(campaignId, eventId) {
+        return apiRequest(`/campaigns/${campaignId}/events/${eventId}`);
+    },
+
+    async createEvent(campaignId, eventData) {
+        return apiRequest(`/campaigns/${campaignId}/events`, {
+            method: 'POST',
+            body: JSON.stringify(eventData)
+        });
+    },
+
+    async updateEvent(campaignId, eventId, eventData) {
+        return apiRequest(`/campaigns/${campaignId}/events/${eventId}`, {
+            method: 'PUT',
+            body: JSON.stringify(eventData)
+        });
+    },
+
+    async deleteEvent(campaignId, eventId) {
+        return apiRequest(`/campaigns/${campaignId}/events/${eventId}`, {
+            method: 'DELETE'
+        });
+    }
+};
+
+// Ideas Inbox API calls
+export const ideaAPI = {
+    async getIdeas(campaignId, params = {}) {
+        const query = new URLSearchParams(params).toString();
+        return apiRequest(`/campaigns/${campaignId}/ideas?${query}`);
+    },
+
+    async getIdea(campaignId, ideaId) {
+        return apiRequest(`/campaigns/${campaignId}/ideas/${ideaId}`);
+    },
+
+    async createIdea(campaignId, ideaData) {
+        return apiRequest(`/campaigns/${campaignId}/ideas`, {
+            method: 'POST',
+            body: JSON.stringify(ideaData)
+        });
+    },
+
+    async updateIdea(campaignId, ideaId, ideaData) {
+        return apiRequest(`/campaigns/${campaignId}/ideas/${ideaId}`, {
+            method: 'PUT',
+            body: JSON.stringify(ideaData)
+        });
+    },
+
+    async deleteIdea(campaignId, ideaId) {
+        return apiRequest(`/campaigns/${campaignId}/ideas/${ideaId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async convertIdea(campaignId, ideaId, targetType) {
+        return apiRequest(`/campaigns/${campaignId}/ideas/${ideaId}/convert?target_type=${targetType}`, {
+            method: 'POST'
+        });
+    }
+};
+
 // Organization API calls
 export const organizationAPI = {
     async getOrganizations(campaignId, params = {}) {

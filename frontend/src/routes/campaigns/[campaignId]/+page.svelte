@@ -3,7 +3,7 @@
     import { page } from '$app/stores';
     import { auth } from '$lib/stores/auth.js';
     import { currentCampaign } from '$lib/stores/campaigns.js';
-    import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI, itemAPI } from '$lib/api.js';
+    import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI, itemAPI, eventAPI, ideaAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
 
     let campaignId;
@@ -16,7 +16,8 @@
         organizations: 0,
         plotHooks: 0,
         events: 0,
-        items: 0
+        items: 0,
+        ideas: 0
     };
 
     onMount(async () => {
@@ -36,12 +37,14 @@
             currentCampaign.set(campaign);
             
             // Load actual stats
-            const [npcResponse, locationResponse, organizationResponse, plotHookResponse, itemResponse] = await Promise.all([
+            const [npcResponse, locationResponse, organizationResponse, plotHookResponse, itemResponse, eventResponse, ideaResponse] = await Promise.all([
                 npcAPI.getNPCs(campaignId, { limit: 1 }),
                 locationAPI.getLocations(campaignId, { limit: 1 }),
                 organizationAPI.getOrganizations(campaignId, { limit: 1 }),
                 plotHookAPI.getPlotHooks(campaignId, { limit: 1 }),
-                itemAPI.getItems(campaignId, { limit: 1 })
+                itemAPI.getItems(campaignId, { limit: 1 }),
+                eventAPI.getEvents(campaignId, { limit: 1 }),
+                ideaAPI.getIdeas(campaignId, { limit: 1 })
             ]);
             
             stats = {
@@ -49,8 +52,9 @@
                 locations: locationResponse.total || 0,
                 organizations: organizationResponse.total || 0,
                 plotHooks: plotHookResponse.total || 0,
-                events: 0, // TODO: implement
-                items: itemResponse.total || 0
+                events: eventResponse.total || 0,
+                items: itemResponse.total || 0,
+                ideas: ideaResponse.total || 0
             };
         } catch (err) {
             error = err.message || 'Failed to load campaign';
@@ -131,7 +135,7 @@
         </div>
 
         <!-- Quick Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
             <a href="/campaigns/{campaignId}/npcs" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">NPCs</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.npcs}</p>
@@ -152,15 +156,19 @@
                 <p class="text-2xl font-bold text-red-500">{stats.plotHooks}</p>
             </a>
             
-            <div class="card text-center opacity-60">
+            <a href="/campaigns/{campaignId}/events" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Events</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.events}</p>
-                <p class="text-xs text-gray-600 mt-1">Coming Soon</p>
-            </div>
+            </a>
             
             <a href="/campaigns/{campaignId}/items" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Items</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.items}</p>
+            </a>
+            
+            <a href="/campaigns/{campaignId}/ideas" class="card hover:bg-gray-750 transition-colors text-center">
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Ideas</h3>
+                <p class="text-2xl font-bold text-red-500">{stats.ideas}</p>
             </a>
         </div>
 
@@ -237,20 +245,33 @@
                 </div>
             </a>
             
-            <div class="card opacity-60">
+            <a href="/campaigns/{campaignId}/events" class="card hover:bg-gray-750 transition-colors group">
                 <div class="flex items-center">
-                    <div class="bg-gray-600 p-3 rounded-lg mr-4">
+                    <div class="bg-red-600 p-3 rounded-lg mr-4">
                         <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-400">Ideas Inbox</h3>
-                        <p class="text-gray-500">Capture and develop your ideas</p>
-                        <p class="text-xs text-gray-600 mt-1">Coming Soon</p>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Manage Events</h3>
+                        <p class="text-gray-400">Timeline of campaign events</p>
                     </div>
                 </div>
-            </div>
+            </a>
+            
+            <a href="/campaigns/{campaignId}/ideas" class="card hover:bg-gray-750 transition-colors group">
+                <div class="flex items-center">
+                    <div class="bg-red-600 p-3 rounded-lg mr-4">
+                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Ideas Inbox</h3>
+                        <p class="text-gray-400">Capture and develop creative ideas</p>
+                    </div>
+                </div>
+            </a>
         </div>
 
         <!-- Recent Activity Placeholder -->

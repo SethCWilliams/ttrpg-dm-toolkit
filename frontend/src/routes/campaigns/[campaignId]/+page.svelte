@@ -6,12 +6,16 @@
     import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI, itemAPI, eventAPI, ideaAPI, sessionNoteAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
     import EditCampaignModal from '$lib/components/EditCampaignModal.svelte';
+    import GlobalSearch from '$lib/components/GlobalSearch.svelte';
 
     let campaignId;
     let campaign = null;
     let loading = true;
     let error = '';
     let showEditModal = false;
+
+    // Reactive statement to get campaignId from page params
+    $: campaignId = $page.params.campaignId;
     let stats = {
         npcs: 0,
         locations: 0,
@@ -29,7 +33,6 @@
             return;
         }
 
-        campaignId = $page.params.campaignId;
         await loadCampaign();
     });
 
@@ -158,6 +161,22 @@
                         <p class="text-gray-300">{formatDate(campaign.created_at)}</p>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Global Search -->
+        <div class="mb-8">
+            <div class="max-w-md mx-auto">
+                {#if campaignId}
+                    <GlobalSearch 
+                        {campaignId}
+                        placeholder="Search NPCs, locations, events, and more..."
+                    />
+                {:else}
+                    <div class="input pl-10 pr-4 w-full bg-gray-700 text-gray-500">
+                        Loading search...
+                    </div>
+                {/if}
             </div>
         </div>
 

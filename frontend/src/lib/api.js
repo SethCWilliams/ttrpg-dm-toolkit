@@ -100,6 +100,14 @@ export const campaignAPI = {
         return apiRequest(`/campaigns/${id}`, {
             method: 'DELETE'
         });
+    },
+
+    async globalSearch(campaignId, query, limit = 20) {
+        const params = new URLSearchParams({
+            q: query,
+            limit: limit.toString()
+        });
+        return apiRequest(`/campaigns/${campaignId}/search?${params}`);
     }
 };
 

@@ -3,7 +3,7 @@
     import { page } from '$app/stores';
     import { auth } from '$lib/stores/auth.js';
     import { currentCampaign } from '$lib/stores/campaigns.js';
-    import { campaignAPI, npcAPI, locationAPI, organizationAPI } from '$lib/api.js';
+    import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
 
     let campaignId;
@@ -36,17 +36,18 @@
             currentCampaign.set(campaign);
             
             // Load actual stats
-            const [npcResponse, locationResponse, organizationResponse] = await Promise.all([
+            const [npcResponse, locationResponse, organizationResponse, plotHookResponse] = await Promise.all([
                 npcAPI.getNPCs(campaignId, { limit: 1 }),
                 locationAPI.getLocations(campaignId, { limit: 1 }),
-                organizationAPI.getOrganizations(campaignId, { limit: 1 })
+                organizationAPI.getOrganizations(campaignId, { limit: 1 }),
+                plotHookAPI.getPlotHooks(campaignId, { limit: 1 })
             ]);
             
             stats = {
                 npcs: npcResponse.total || 0,
                 locations: locationResponse.total || 0,
                 organizations: organizationResponse.total || 0,
-                plotHooks: 0, // TODO: implement
+                plotHooks: plotHookResponse.total || 0,
                 events: 0, // TODO: implement
                 items: 0 // TODO: implement
             };
@@ -145,11 +146,10 @@
                 <p class="text-2xl font-bold text-red-500">{stats.organizations}</p>
             </a>
             
-            <div class="card text-center opacity-60">
+            <a href="/campaigns/{campaignId}/plot-hooks" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Plot Hooks</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.plotHooks}</p>
-                <p class="text-xs text-gray-600 mt-1">Coming Soon</p>
-            </div>
+            </a>
             
             <div class="card text-center opacity-60">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Events</h3>
@@ -205,6 +205,20 @@
                     <div>
                         <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Manage Organizations</h3>
                         <p class="text-gray-400">Guilds, governments, and factions</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/campaigns/{campaignId}/plot-hooks" class="card hover:bg-gray-750 transition-colors group">
+                <div class="flex items-center">
+                    <div class="bg-red-600 p-3 rounded-lg mr-4">
+                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Manage Plot Hooks</h3>
+                        <p class="text-gray-400">Adventure hooks and storylines</p>
                     </div>
                 </div>
             </a>

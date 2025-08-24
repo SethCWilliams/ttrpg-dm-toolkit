@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { npcAPI, locationAPI } from '$lib/api.js';
+    import { npcAPI, locationAPI, aiAPI } from '$lib/api.js';
     import { onMount } from 'svelte';
 
     export let campaignId;
@@ -29,6 +29,7 @@
     let loading = false;
     let error = '';
     let locations = [];
+    let generatingAI = false;
 
     onMount(async () => {
         await loadLocations();
@@ -49,6 +50,60 @@
 
     function removePersonalityTrait(index) {
         personalityTraits = personalityTraits.filter((_, i) => i !== index);
+    }
+
+    async function generateRandomNPC() {
+        generatingAI = true;
+        error = '';
+
+        try {
+            const response = await aiAPI.generateNPC(campaignId);
+            
+            if (response.success && response.npc) {
+                const npc = response.npc;
+                
+                // Populate form fields with generated data
+                name = npc.name || '';
+                race = npc.race || '';
+                gender = npc.gender || '';
+                age = npc.age?.toString() || '';
+                occupation = npc.occupation || '';
+                
+                // Handle location - for now just use the generated location string
+                // TODO: In future, try to match with existing locations
+                
+                // Convert personality traits string back to array if needed
+                if (typeof npc.personality_traits === 'string') {
+                    personalityTraits = npc.personality_traits.split(',').map(t => t.trim()).filter(t => t);
+                } else if (Array.isArray(npc.personality_traits)) {
+                    personalityTraits = npc.personality_traits;
+                }
+                
+                // Ensure we have at least one trait field
+                if (personalityTraits.length === 0) {
+                    personalityTraits = [''];
+                }
+                
+                ideals = npc.ideals || '';
+                bonds = npc.bonds || '';
+                flaws = npc.flaws || '';
+                appearanceDescription = npc.appearance || '';
+                background = npc.background || '';
+                voiceDescription = npc.voice_mannerisms || '';
+                notes = npc.notes || '';
+                
+                // Show success message if there was a warning
+                if (response.warning) {
+                    error = response.warning;
+                }
+            } else {
+                error = response.message || 'Failed to generate NPC';
+            }
+        } catch (err) {
+            error = err.message || 'Failed to generate NPC. Please try again.';
+        } finally {
+            generatingAI = false;
+        }
     }
 
     async function handleSubmit() {
@@ -108,7 +163,25 @@
     <div class="bg-gray-800 rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
         <!-- Header -->
         <div class="flex items-center justify-between p-6 border-b border-gray-700">
-            <h2 class="text-xl font-semibold text-white">Create New NPC</h2>
+            <div class="flex items-center space-x-4">
+                <h2 class="text-xl font-semibold text-white">Create New NPC</h2>
+                <button
+                    on:click={generateRandomNPC}
+                    disabled={generatingAI}
+                    class="btn btn-secondary flex items-center space-x-2 text-sm {generatingAI ? 'opacity-50 cursor-not-allowed' : ''}"
+                    title="Generate a random NPC using AI"
+                >
+                    {#if generatingAI}
+                        <div class="animate-spin h-4 w-4 border-2 border-gray-300 border-t-red-500 rounded-full"></div>
+                        <span>Generating...</span>
+                    {:else}
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span>Randomize</span>
+                    {/if}
+                </button>
+            </div>
             <button
                 on:click={handleClose}
                 class="text-gray-400 hover:text-white"

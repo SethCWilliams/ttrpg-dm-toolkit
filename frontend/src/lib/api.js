@@ -405,3 +405,23 @@ export const sessionNoteAPI = {
         });
     }
 };
+
+// AI API calls
+export const aiAPI = {
+    async getStatus() {
+        return apiRequest('/ai/status');
+    },
+
+    async generateNPC(campaignId) {
+        return apiRequest(`/ai/generate/npc/${campaignId}`, {
+            method: 'POST'
+        });
+    },
+
+    async updateAPIKeys(keys) {
+        return apiRequest('/ai/update-keys', {
+            method: 'POST',
+            body: JSON.stringify(keys)
+        });
+    }
+};

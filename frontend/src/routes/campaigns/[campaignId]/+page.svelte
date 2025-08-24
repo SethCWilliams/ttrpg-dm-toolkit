@@ -3,13 +3,15 @@
     import { page } from '$app/stores';
     import { auth } from '$lib/stores/auth.js';
     import { currentCampaign } from '$lib/stores/campaigns.js';
-    import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI, itemAPI, eventAPI, ideaAPI } from '$lib/api.js';
+    import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI, itemAPI, eventAPI, ideaAPI, sessionNoteAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
+    import EditCampaignModal from '$lib/components/EditCampaignModal.svelte';
 
     let campaignId;
     let campaign = null;
     let loading = true;
     let error = '';
+    let showEditModal = false;
     let stats = {
         npcs: 0,
         locations: 0,
@@ -17,7 +19,8 @@
         plotHooks: 0,
         events: 0,
         items: 0,
-        ideas: 0
+        ideas: 0,
+        sessions: 0
     };
 
     onMount(async () => {
@@ -37,14 +40,15 @@
             currentCampaign.set(campaign);
             
             // Load actual stats
-            const [npcResponse, locationResponse, organizationResponse, plotHookResponse, itemResponse, eventResponse, ideaResponse] = await Promise.all([
+            const [npcResponse, locationResponse, organizationResponse, plotHookResponse, itemResponse, eventResponse, ideaResponse, sessionResponse] = await Promise.all([
                 npcAPI.getNPCs(campaignId, { limit: 1 }),
                 locationAPI.getLocations(campaignId, { limit: 1 }),
                 organizationAPI.getOrganizations(campaignId, { limit: 1 }),
                 plotHookAPI.getPlotHooks(campaignId, { limit: 1 }),
                 itemAPI.getItems(campaignId, { limit: 1 }),
                 eventAPI.getEvents(campaignId, { limit: 1 }),
-                ideaAPI.getIdeas(campaignId, { limit: 1 })
+                ideaAPI.getIdeas(campaignId, { limit: 1 }),
+                sessionNoteAPI.getSessionNotes(campaignId, { limit: 1 })
             ]);
             
             stats = {
@@ -54,7 +58,8 @@
                 plotHooks: plotHookResponse.total || 0,
                 events: eventResponse.total || 0,
                 items: itemResponse.total || 0,
-                ideas: ideaResponse.total || 0
+                ideas: ideaResponse.total || 0,
+                sessions: sessionResponse.total || 0
             };
         } catch (err) {
             error = err.message || 'Failed to load campaign';
@@ -69,6 +74,16 @@
             month: 'long',
             day: 'numeric'
         });
+    }
+
+    function handleCampaignUpdated(event) {
+        campaign = event.detail.campaign;
+        currentCampaign.set(campaign);
+        showEditModal = false;
+    }
+
+    function handleModalClose() {
+        showEditModal = false;
     }
 </script>
 
@@ -113,8 +128,8 @@
                 Back to Dashboard
             </button>
             
-            <div class="flex items-center justify-between">
-                <div>
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
                     <h1 class="text-3xl font-bold text-white mb-2">{campaign.name}</h1>
                     {#if campaign.description}
                         <p class="text-gray-400 mb-2">{campaign.description}</p>
@@ -127,15 +142,27 @@
                     {/if}
                 </div>
                 
-                <div class="text-right">
-                    <p class="text-sm text-gray-500">Created</p>
-                    <p class="text-gray-300">{formatDate(campaign.created_at)}</p>
+                <div class="flex items-start space-x-4">
+                    <button
+                        on:click={() => showEditModal = true}
+                        class="btn btn-secondary"
+                    >
+                        <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit Campaign
+                    </button>
+                    
+                    <div class="text-right">
+                        <p class="text-sm text-gray-500">Created</p>
+                        <p class="text-gray-300">{formatDate(campaign.created_at)}</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
             <a href="/campaigns/{campaignId}/npcs" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">NPCs</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.npcs}</p>
@@ -169,6 +196,11 @@
             <a href="/campaigns/{campaignId}/ideas" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Ideas</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.ideas}</p>
+            </a>
+            
+            <a href="/campaigns/{campaignId}/sessions" class="card hover:bg-gray-750 transition-colors text-center">
+                <h3 class="text-sm font-medium text-gray-400 mb-1">Sessions</h3>
+                <p class="text-2xl font-bold text-red-500">{stats.sessions}</p>
             </a>
         </div>
 
@@ -272,6 +304,20 @@
                     </div>
                 </div>
             </a>
+            
+            <a href="/campaigns/{campaignId}/sessions" class="card hover:bg-gray-750 transition-colors group">
+                <div class="flex items-center">
+                    <div class="bg-red-600 p-3 rounded-lg mr-4">
+                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Session Notes</h3>
+                        <p class="text-gray-400">Document and track campaign sessions</p>
+                    </div>
+                </div>
+            </a>
         </div>
 
         <!-- Recent Activity Placeholder -->
@@ -287,3 +333,12 @@
         </div>
     {/if}
 </div>
+
+<!-- Edit Campaign Modal -->
+{#if showEditModal && campaign}
+    <EditCampaignModal 
+        {campaign}
+        on:updated={handleCampaignUpdated}
+        on:close={handleModalClose}
+    />
+{/if}

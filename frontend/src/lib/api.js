@@ -359,3 +359,41 @@ export const organizationAPI = {
         return apiRequest('/campaigns/0/organizations/templates/fields');
     }
 };
+
+// Session Notes API calls
+export const sessionNoteAPI = {
+    async getSessionNotes(campaignId, params = {}) {
+        const query = new URLSearchParams(params).toString();
+        return apiRequest(`/campaigns/${campaignId}/sessions?${query}`);
+    },
+
+    async getSessionNote(campaignId, sessionNoteId) {
+        return apiRequest(`/campaigns/${campaignId}/sessions/${sessionNoteId}`);
+    },
+
+    async createSessionNote(campaignId, sessionNoteData) {
+        return apiRequest(`/campaigns/${campaignId}/sessions`, {
+            method: 'POST',
+            body: JSON.stringify(sessionNoteData)
+        });
+    },
+
+    async updateSessionNote(campaignId, sessionNoteId, sessionNoteData) {
+        return apiRequest(`/campaigns/${campaignId}/sessions/${sessionNoteId}`, {
+            method: 'PUT',
+            body: JSON.stringify(sessionNoteData)
+        });
+    },
+
+    async deleteSessionNote(campaignId, sessionNoteId) {
+        return apiRequest(`/campaigns/${campaignId}/sessions/${sessionNoteId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async duplicateSessionNote(campaignId, sessionNoteId) {
+        return apiRequest(`/campaigns/${campaignId}/sessions/${sessionNoteId}/duplicate`, {
+            method: 'POST'
+        });
+    }
+};

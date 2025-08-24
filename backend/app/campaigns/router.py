@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from app.database import get_db
-from app.models import Campaign, User, NPC, Location, Organization, PlotHook, Event, Item
+from app.models import Campaign, User, NPC, Location, Organization, PlotHook, Event, Item, SessionNote
 from app.schemas import (
     CampaignCreate, CampaignUpdate, Campaign as CampaignSchema, 
     CampaignWithStats
@@ -59,6 +59,7 @@ async def get_campaign(
         "plot_hook_count": db.query(PlotHook).filter(PlotHook.campaign_id == campaign_id).count(),
         "event_count": db.query(Event).filter(Event.campaign_id == campaign_id).count(),
         "item_count": db.query(Item).filter(Item.campaign_id == campaign_id).count(),
+        "session_note_count": db.query(SessionNote).filter(SessionNote.campaign_id == campaign_id).count(),
     }
     
     # Convert to dict and add stats

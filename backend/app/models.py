@@ -38,6 +38,7 @@ class Campaign(Base):
     events = relationship("Event", back_populates="campaign", cascade="all, delete-orphan")
     items = relationship("Item", back_populates="campaign", cascade="all, delete-orphan")
     ideas_inbox = relationship("Idea", back_populates="campaign", cascade="all, delete-orphan")
+    session_notes = relationship("SessionNote", back_populates="campaign", cascade="all, delete-orphan")
 
 class NPC(Base):
     __tablename__ = "npcs"
@@ -221,3 +222,36 @@ class Idea(Base):
     
     # Relationships
     campaign = relationship("Campaign", back_populates="ideas_inbox")
+
+class SessionNote(Base):
+    __tablename__ = "session_notes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    campaign_id = Column(Integer, ForeignKey("campaigns.id"), nullable=False)
+    title = Column(String(300), nullable=False)
+    session_number = Column(Integer)
+    session_date = Column(String(50))  # Real-world date when the session was played
+    in_world_date = Column(String(100))  # In-world date when events occurred
+    summary = Column(Text)
+    detailed_notes = Column(Text)
+    player_characters = Column(JSON)  # Array of PC objects with names and key actions
+    npcs_encountered = Column(JSON)  # Array of NPC references and interactions
+    locations_visited = Column(JSON)  # Array of location references
+    plot_hooks_advanced = Column(JSON)  # Array of plot hook references and progress
+    events_occurred = Column(JSON)  # Array of event descriptions
+    items_acquired = Column(JSON)  # Array of item references and acquisition details
+    experience_gained = Column(Integer, default=0)
+    loot_acquired = Column(JSON)  # Array of loot objects
+    combat_encounters = Column(JSON)  # Array of combat encounter details
+    social_encounters = Column(JSON)  # Array of social interaction details
+    exploration_discoveries = Column(JSON)  # Array of discovery objects
+    world_state_changes = Column(JSON)  # Array of changes to world state
+    dm_notes = Column(Text)  # Private DM notes about the session
+    next_session_prep = Column(Text)  # Notes for preparing the next session
+    status = Column(String(50), default="draft")  # draft, published, archived
+    visibility = Column(String(50), default="dm_only")  # dm_only, player_visible
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    campaign = relationship("Campaign", back_populates="session_notes")

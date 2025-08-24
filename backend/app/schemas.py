@@ -437,3 +437,68 @@ class PaginatedEventResponse(BaseModel):
 class PaginatedIdeaResponse(BaseModel):
     total: int
     items: List['Idea']
+
+# Session Notes schemas
+class SessionNoteBase(BaseModel):
+    title: str
+    session_number: Optional[int] = None
+    session_date: Optional[str] = None
+    in_world_date: Optional[str] = None
+    summary: Optional[str] = None
+    detailed_notes: Optional[str] = None
+    player_characters: Optional[List[Dict[str, Any]]] = []
+    npcs_encountered: Optional[List[Dict[str, Any]]] = []
+    locations_visited: Optional[List[Dict[str, Any]]] = []
+    plot_hooks_advanced: Optional[List[Dict[str, Any]]] = []
+    events_occurred: Optional[List[Dict[str, Any]]] = []
+    items_acquired: Optional[List[Dict[str, Any]]] = []
+    experience_gained: Optional[int] = 0
+    loot_acquired: Optional[List[Dict[str, Any]]] = []
+    combat_encounters: Optional[List[Dict[str, Any]]] = []
+    social_encounters: Optional[List[Dict[str, Any]]] = []
+    exploration_discoveries: Optional[List[Dict[str, Any]]] = []
+    world_state_changes: Optional[List[Dict[str, Any]]] = []
+    dm_notes: Optional[str] = None
+    next_session_prep: Optional[str] = None
+    status: Optional[str] = "draft"
+    visibility: Optional[str] = "dm_only"
+
+class SessionNoteCreate(SessionNoteBase):
+    pass
+
+class SessionNoteUpdate(BaseModel):
+    title: Optional[str] = None
+    session_number: Optional[int] = None
+    session_date: Optional[str] = None
+    in_world_date: Optional[str] = None
+    summary: Optional[str] = None
+    detailed_notes: Optional[str] = None
+    player_characters: Optional[List[Dict[str, Any]]] = None
+    npcs_encountered: Optional[List[Dict[str, Any]]] = None
+    locations_visited: Optional[List[Dict[str, Any]]] = None
+    plot_hooks_advanced: Optional[List[Dict[str, Any]]] = None
+    events_occurred: Optional[List[Dict[str, Any]]] = None
+    items_acquired: Optional[List[Dict[str, Any]]] = None
+    experience_gained: Optional[int] = None
+    loot_acquired: Optional[List[Dict[str, Any]]] = None
+    combat_encounters: Optional[List[Dict[str, Any]]] = None
+    social_encounters: Optional[List[Dict[str, Any]]] = None
+    exploration_discoveries: Optional[List[Dict[str, Any]]] = None
+    world_state_changes: Optional[List[Dict[str, Any]]] = None
+    dm_notes: Optional[str] = None
+    next_session_prep: Optional[str] = None
+    status: Optional[str] = None
+    visibility: Optional[str] = None
+
+class SessionNote(SessionNoteBase):
+    id: int
+    campaign_id: int
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class PaginatedSessionNoteResponse(BaseModel):
+    total: int
+    items: List['SessionNote']

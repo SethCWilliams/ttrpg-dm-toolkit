@@ -74,13 +74,13 @@ Current Phase: **Foundation Complete** - Core authentication and campaign manage
 - [ ] Integration with other world elements
 
 ### Items System
-- [ ] Item API endpoints (CRUD operations)
-- [ ] Item forms with mechanical effects
-- [ ] Rarity and type classification
-- [ ] Ownership tracking (NPCs and locations)
-- [ ] Value and weight management
-- [ ] Magical properties and attunement
-- [ ] Item history and significance
+- [x] Item API endpoints (CRUD operations)
+- [x] Item forms with mechanical effects
+- [x] Rarity and type classification
+- [x] Ownership tracking (NPCs and locations)
+- [x] Value and weight management
+- [x] Magical properties and attunement
+- [x] Item history and significance
 
 ### Ideas Inbox
 - [ ] Ideas API endpoints (CRUD operations)
@@ -222,10 +222,10 @@ Current Phase: **Foundation Complete** - Core authentication and campaign manage
 
 ## 🎯 Current Priority
 
-**Next Up: Complete Phase 2 - Organizations System Finalization**
-1. Implement organizational hierarchy and roles system
-2. Add alliance and enemy relationships between organizations
-3. Consider starting Plot Hooks System (Phase 3)
+**Next Up: Complete Phase 3 Advanced Features**
+1. Finish Events System implementation
+2. Complete Ideas Inbox system
+3. Consider starting Phase 4 - Session Management
 
 ---
 
@@ -233,8 +233,8 @@ Current Phase: **Foundation Complete** - Core authentication and campaign manage
 
 - **Phase 1**: ✅ 100% Complete (8/8 items)
 - **Phase 2**: 🚧 92% Complete (23/25 items)
-- **Phase 3**: 🚧 100% Complete (7/7 items) - Plot Hooks System
-- **Overall Project**: 🚧 78% Complete (38/49 major features)
+- **Phase 3**: 🚧 100% Complete (14/14 items) - Plot Hooks and Items Systems
+- **Overall Project**: 🚧 86% Complete (45/56 major features)
 
 ---
 

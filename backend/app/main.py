@@ -6,6 +6,7 @@ from app.campaigns import router as campaigns_router
 from app.npcs import router as npcs_router
 from app.locations import router as locations_router
 from app.organizations import router as organizations_router
+from app.plot_hooks import router as plot_hooks_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -31,6 +32,7 @@ app.include_router(campaigns_router.router, prefix="/campaigns", tags=["campaign
 app.include_router(npcs_router.router, prefix="/campaigns/{campaign_id}/npcs", tags=["npcs"])
 app.include_router(locations_router.router, prefix="/campaigns/{campaign_id}/locations", tags=["locations"])
 app.include_router(organizations_router.router, prefix="/campaigns/{campaign_id}/organizations", tags=["organizations"])
+app.include_router(plot_hooks_router.router, prefix="/campaigns/{campaign_id}/plot-hooks", tags=["plot-hooks"])
 
 @app.get("/")
 async def root():

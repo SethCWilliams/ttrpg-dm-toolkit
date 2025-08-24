@@ -50,7 +50,7 @@ Current Phase: **Foundation Complete** - Core authentication and campaign manage
 - [x] Influence level and scope management
 - [x] Integration with locations (headquarters display)
 - [ ] Organizational hierarchy and roles
-- [ ] Alliance and enemy relationships
+- [x] Alliance and enemy relationships
 
 ---
 

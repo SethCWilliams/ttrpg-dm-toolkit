@@ -212,6 +212,22 @@ class PlotHookBase(BaseModel):
 class PlotHookCreate(PlotHookBase):
     pass
 
+class PlotHookUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    hook_type: Optional[str] = None
+    urgency: Optional[str] = None
+    complexity: Optional[str] = None
+    related_npcs: Optional[List[int]] = None
+    related_locations: Optional[List[int]] = None
+    related_organizations: Optional[List[int]] = None
+    prerequisites: Optional[List[Dict[str, Any]]] = None
+    rewards: Optional[Dict[str, Any]] = None
+    consequences: Optional[Dict[str, Any]] = None
+    status: Optional[str] = None
+    visibility: Optional[str] = None
+    notes: Optional[str] = None
+
 class PlotHook(PlotHookBase):
     id: int
     campaign_id: int
@@ -376,3 +392,7 @@ class Organization(OrganizationBase):
 class PaginatedOrganizationResponse(BaseModel):
     total: int
     items: List['Organization']
+
+class PaginatedPlotHookResponse(BaseModel):
+    total: int
+    items: List['PlotHook']

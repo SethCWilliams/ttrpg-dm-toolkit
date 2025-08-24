@@ -3,7 +3,7 @@
     import { page } from '$app/stores';
     import { auth } from '$lib/stores/auth.js';
     import { currentCampaign } from '$lib/stores/campaigns.js';
-    import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI } from '$lib/api.js';
+    import { campaignAPI, npcAPI, locationAPI, organizationAPI, plotHookAPI, itemAPI } from '$lib/api.js';
     import { goto } from '$app/navigation';
 
     let campaignId;
@@ -36,11 +36,12 @@
             currentCampaign.set(campaign);
             
             // Load actual stats
-            const [npcResponse, locationResponse, organizationResponse, plotHookResponse] = await Promise.all([
+            const [npcResponse, locationResponse, organizationResponse, plotHookResponse, itemResponse] = await Promise.all([
                 npcAPI.getNPCs(campaignId, { limit: 1 }),
                 locationAPI.getLocations(campaignId, { limit: 1 }),
                 organizationAPI.getOrganizations(campaignId, { limit: 1 }),
-                plotHookAPI.getPlotHooks(campaignId, { limit: 1 })
+                plotHookAPI.getPlotHooks(campaignId, { limit: 1 }),
+                itemAPI.getItems(campaignId, { limit: 1 })
             ]);
             
             stats = {
@@ -49,7 +50,7 @@
                 organizations: organizationResponse.total || 0,
                 plotHooks: plotHookResponse.total || 0,
                 events: 0, // TODO: implement
-                items: 0 // TODO: implement
+                items: itemResponse.total || 0
             };
         } catch (err) {
             error = err.message || 'Failed to load campaign';
@@ -157,11 +158,10 @@
                 <p class="text-xs text-gray-600 mt-1">Coming Soon</p>
             </div>
             
-            <div class="card text-center opacity-60">
+            <a href="/campaigns/{campaignId}/items" class="card hover:bg-gray-750 transition-colors text-center">
                 <h3 class="text-sm font-medium text-gray-400 mb-1">Items</h3>
                 <p class="text-2xl font-bold text-red-500">{stats.items}</p>
-                <p class="text-xs text-gray-600 mt-1">Coming Soon</p>
-            </div>
+            </a>
         </div>
 
         <!-- Quick Actions -->
@@ -219,6 +219,20 @@
                     <div>
                         <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Manage Plot Hooks</h3>
                         <p class="text-gray-400">Adventure hooks and storylines</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/campaigns/{campaignId}/items" class="card hover:bg-gray-750 transition-colors group">
+                <div class="flex items-center">
+                    <div class="bg-red-600 p-3 rounded-lg mr-4">
+                        <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-red-400 transition-colors">Manage Items</h3>
+                        <p class="text-gray-400">Weapons, armor, treasures, and artifacts</p>
                     </div>
                 </div>
             </a>

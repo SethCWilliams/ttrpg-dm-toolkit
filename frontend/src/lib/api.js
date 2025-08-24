@@ -218,6 +218,42 @@ export const plotHookAPI = {
     }
 };
 
+// Item API calls
+export const itemAPI = {
+    async getItems(campaignId, params = {}) {
+        const query = new URLSearchParams(params).toString();
+        return apiRequest(`/campaigns/${campaignId}/items?${query}`);
+    },
+
+    async getItem(campaignId, itemId) {
+        return apiRequest(`/campaigns/${campaignId}/items/${itemId}`);
+    },
+
+    async createItem(campaignId, itemData) {
+        return apiRequest(`/campaigns/${campaignId}/items`, {
+            method: 'POST',
+            body: JSON.stringify(itemData)
+        });
+    },
+
+    async updateItem(campaignId, itemId, itemData) {
+        return apiRequest(`/campaigns/${campaignId}/items/${itemId}`, {
+            method: 'PUT',
+            body: JSON.stringify(itemData)
+        });
+    },
+
+    async deleteItem(campaignId, itemId) {
+        return apiRequest(`/campaigns/${campaignId}/items/${itemId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async getItemTemplateFields() {
+        return apiRequest('/campaigns/0/items/templates/fields');
+    }
+};
+
 // Organization API calls
 export const organizationAPI = {
     async getOrganizations(campaignId, params = {}) {

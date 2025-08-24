@@ -283,6 +283,22 @@ class ItemBase(BaseModel):
 class ItemCreate(ItemBase):
     pass
 
+class ItemUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    rarity: Optional[str] = None
+    description: Optional[str] = None
+    mechanical_effects: Optional[Dict[str, Any]] = None
+    history: Optional[str] = None
+    current_owner_id: Optional[int] = None
+    current_location_id: Optional[int] = None
+    value: Optional[int] = None
+    weight: Optional[int] = None
+    attunement_required: Optional[bool] = None
+    status: Optional[str] = None
+    visibility: Optional[str] = None
+    notes: Optional[str] = None
+
 class Item(ItemBase):
     id: int
     campaign_id: int
@@ -396,3 +412,7 @@ class PaginatedOrganizationResponse(BaseModel):
 class PaginatedPlotHookResponse(BaseModel):
     total: int
     items: List['PlotHook']
+
+class PaginatedItemResponse(BaseModel):
+    total: int
+    items: List['Item']

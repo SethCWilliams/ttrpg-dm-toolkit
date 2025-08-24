@@ -254,6 +254,19 @@ class EventBase(BaseModel):
 class EventCreate(EventBase):
     pass
 
+class EventUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    event_type: Optional[str] = None
+    date: Optional[str] = None
+    location_id: Optional[int] = None
+    participants: Optional[List[Dict[str, Any]]] = None
+    causes: Optional[List[str]] = None
+    effects: Optional[List[str]] = None
+    visibility: Optional[str] = None
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
 class Event(EventBase):
     id: int
     campaign_id: int
@@ -416,3 +429,11 @@ class PaginatedPlotHookResponse(BaseModel):
 class PaginatedItemResponse(BaseModel):
     total: int
     items: List['Item']
+
+class PaginatedEventResponse(BaseModel):
+    total: int
+    items: List['Event']
+
+class PaginatedIdeaResponse(BaseModel):
+    total: int
+    items: List['Idea']

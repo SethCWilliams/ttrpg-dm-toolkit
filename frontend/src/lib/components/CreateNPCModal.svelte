@@ -305,14 +305,30 @@
                                     />
                                 </div>
                                 <div>
-                                    <label for="gender" class="block text-sm font-medium text-gray-300 mb-2">
-                                        Gender
+                                    <label for="gender" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                        <span>Gender</span>
+                                        <button
+                                            type="button"
+                                            on:click={() => toggleFieldLock('gender')}
+                                            class="text-gray-400 hover:text-white transition-colors ml-2"
+                                            title="{lockedFields.gender ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                        >
+                                            {#if lockedFields.gender}
+                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                            {:else}
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                </svg>
+                                            {/if}
+                                        </button>
                                     </label>
                                     <input
                                         id="gender"
                                         type="text"
                                         bind:value={gender}
-                                        class="input w-full"
+                                        class="input w-full {lockedFields.gender ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                         placeholder="e.g., Male, Female"
                                     />
                                 </div>
@@ -320,14 +336,30 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="age" class="block text-sm font-medium text-gray-300 mb-2">
-                                        Age
+                                    <label for="age" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                        <span>Age</span>
+                                        <button
+                                            type="button"
+                                            on:click={() => toggleFieldLock('age')}
+                                            class="text-gray-400 hover:text-white transition-colors ml-2"
+                                            title="{lockedFields.age ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                        >
+                                            {#if lockedFields.age}
+                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                            {:else}
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                </svg>
+                                            {/if}
+                                        </button>
                                     </label>
                                     <input
                                         id="age"
                                         type="number"
                                         bind:value={age}
-                                        class="input w-full"
+                                        class="input w-full {lockedFields.age ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                         placeholder="Age in years"
                                         min="0"
                                     />
@@ -363,13 +395,29 @@
                             </div>
 
                             <div>
-                                <label for="location" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Location
+                                <label for="location" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Location</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('location')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.location ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.location}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <select
                                     id="location"
                                     bind:value={locationId}
-                                    class="input w-full"
+                                    class="input w-full {lockedFields.location ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                 >
                                     <option value="">No specific location</option>
                                     {#each locations as location}
@@ -386,15 +434,31 @@
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">
-                                    Personality Traits
+                                <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Personality Traits</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('personalityTraits')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.personalityTraits ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.personalityTraits}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 {#each personalityTraits as trait, index}
                                     <div class="flex gap-2 mb-2">
                                         <input
                                             type="text"
                                             bind:value={trait}
-                                            class="input flex-1"
+                                            class="input flex-1 {lockedFields.personalityTraits ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                             placeholder="e.g., Friendly, Suspicious"
                                         />
                                         {#if personalityTraits.length > 1}
@@ -418,40 +482,88 @@
                             </div>
 
                             <div>
-                                <label for="ideals" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Ideals
+                                <label for="ideals" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Ideals</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('ideals')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.ideals ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.ideals}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <textarea
                                     id="ideals"
                                     bind:value={ideals}
                                     rows="2"
-                                    class="input w-full resize-none"
+                                    class="input w-full resize-none {lockedFields.ideals ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                     placeholder="What drives this character..."
                                 ></textarea>
                             </div>
 
                             <div>
-                                <label for="bonds" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Bonds
+                                <label for="bonds" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Bonds</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('bonds')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.bonds ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.bonds}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <textarea
                                     id="bonds"
                                     bind:value={bonds}
                                     rows="2"
-                                    class="input w-full resize-none"
+                                    class="input w-full resize-none {lockedFields.bonds ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                     placeholder="Important connections and relationships..."
                                 ></textarea>
                             </div>
 
                             <div>
-                                <label for="flaws" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Flaws
+                                <label for="flaws" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Flaws</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('flaws')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.flaws ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.flaws}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <textarea
                                     id="flaws"
                                     bind:value={flaws}
                                     rows="2"
-                                    class="input w-full resize-none"
+                                    class="input w-full resize-none {lockedFields.flaws ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                     placeholder="Character weaknesses and vices..."
                                 ></textarea>
                             </div>
@@ -467,40 +579,88 @@
                         
                         <div class="space-y-4">
                             <div>
-                                <label for="appearance" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Appearance
+                                <label for="appearance" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Appearance</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('appearanceDescription')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.appearanceDescription ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.appearanceDescription}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <textarea
                                     id="appearance"
                                     bind:value={appearanceDescription}
                                     rows="3"
-                                    class="input w-full resize-none"
+                                    class="input w-full resize-none {lockedFields.appearanceDescription ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                     placeholder="Physical description..."
                                 ></textarea>
                             </div>
 
                             <div>
-                                <label for="voice" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Voice & Mannerisms
+                                <label for="voice" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Voice & Mannerisms</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('voiceDescription')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.voiceDescription ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.voiceDescription}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <textarea
                                     id="voice"
                                     bind:value={voiceDescription}
                                     rows="2"
-                                    class="input w-full resize-none"
+                                    class="input w-full resize-none {lockedFields.voiceDescription ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                     placeholder="How they speak and act..."
                                 ></textarea>
                             </div>
 
                             <div>
-                                <label for="background" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Background
+                                <label for="background" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Background</span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('background')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.background ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.background}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <textarea
                                     id="background"
                                     bind:value={background}
                                     rows="4"
-                                    class="input w-full resize-none"
+                                    class="input w-full resize-none {lockedFields.background ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                     placeholder="Character history and background..."
                                 ></textarea>
                             </div>
@@ -545,14 +705,30 @@
                         </div>
 
                         <div>
-                            <label for="notes" class="block text-sm font-medium text-gray-300 mb-2">
-                                Notes
+                            <label for="notes" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                <span>Notes</span>
+                                <button
+                                    type="button"
+                                    on:click={() => toggleFieldLock('notes')}
+                                    class="text-gray-400 hover:text-white transition-colors ml-2"
+                                    title="{lockedFields.notes ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                >
+                                    {#if lockedFields.notes}
+                                        <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    {:else}
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                        </svg>
+                                    {/if}
+                                </button>
                             </label>
                             <textarea
                                 id="notes"
                                 bind:value={notes}
                                 rows="3"
-                                class="input w-full resize-none"
+                                class="input w-full resize-none {lockedFields.notes ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                 placeholder="Additional notes..."
                             ></textarea>
                         </div>

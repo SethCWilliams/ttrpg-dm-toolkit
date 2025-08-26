@@ -412,9 +412,10 @@ export const aiAPI = {
         return apiRequest('/ai/status');
     },
 
-    async generateNPC(campaignId) {
+    async generateNPC(campaignId, lockedData = {}) {
         return apiRequest(`/ai/generate/npc/${campaignId}`, {
-            method: 'POST'
+            method: 'POST',
+            body: JSON.stringify({ locked_fields: lockedData })
         });
     },
 

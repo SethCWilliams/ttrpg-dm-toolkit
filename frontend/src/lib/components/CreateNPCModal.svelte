@@ -30,6 +30,24 @@
     let error = '';
     let locations = [];
     let generatingAI = false;
+    
+    // Field locking state
+    let lockedFields = {
+        name: false,
+        race: false,
+        gender: false,
+        age: false,
+        occupation: false,
+        location: false,
+        personalityTraits: false,
+        ideals: false,
+        bonds: false,
+        flaws: false,
+        appearanceDescription: false,
+        background: false,
+        voiceDescription: false,
+        notes: false
+    };
 
     onMount(async () => {
         await loadLocations();
@@ -52,45 +70,64 @@
         personalityTraits = personalityTraits.filter((_, i) => i !== index);
     }
 
+    function toggleFieldLock(field) {
+        lockedFields[field] = !lockedFields[field];
+        lockedFields = { ...lockedFields }; // Trigger reactivity
+    }
+
     async function generateRandomNPC() {
         generatingAI = true;
         error = '';
 
         try {
-            const response = await aiAPI.generateNPC(campaignId);
+            // Collect locked field data to send as constraints
+            const lockedData = {};
+            if (lockedFields.name && name.trim()) lockedData.name = name.trim();
+            if (lockedFields.race && race.trim()) lockedData.race = race.trim();
+            if (lockedFields.gender && gender.trim()) lockedData.gender = gender.trim();
+            if (lockedFields.age && age.trim()) lockedData.age = age.trim();
+            if (lockedFields.occupation && occupation.trim()) lockedData.occupation = occupation.trim();
+            if (lockedFields.ideals && ideals.trim()) lockedData.ideals = ideals.trim();
+            if (lockedFields.bonds && bonds.trim()) lockedData.bonds = bonds.trim();
+            if (lockedFields.flaws && flaws.trim()) lockedData.flaws = flaws.trim();
+            if (lockedFields.background && background.trim()) lockedData.background = background.trim();
+            if (lockedFields.appearanceDescription && appearanceDescription.trim()) lockedData.appearance = appearanceDescription.trim();
+            if (lockedFields.voiceDescription && voiceDescription.trim()) lockedData.voice_mannerisms = voiceDescription.trim();
+            if (lockedFields.notes && notes.trim()) lockedData.notes = notes.trim();
+            
+            const response = await aiAPI.generateNPC(campaignId, lockedData);
             
             if (response.success && response.npc) {
                 const npc = response.npc;
                 
-                // Populate form fields with generated data
-                name = npc.name || '';
-                race = npc.race || '';
-                gender = npc.gender || '';
-                age = npc.age?.toString() || '';
-                occupation = npc.occupation || '';
+                // Only populate unlocked fields with generated data
+                if (!lockedFields.name) name = npc.name || '';
+                if (!lockedFields.race) race = npc.race || '';
+                if (!lockedFields.gender) gender = npc.gender || '';
+                if (!lockedFields.age) age = npc.age?.toString() || '';
+                if (!lockedFields.occupation) occupation = npc.occupation || '';
                 
-                // Handle location - for now just use the generated location string
-                // TODO: In future, try to match with existing locations
-                
-                // Convert personality traits string back to array if needed
-                if (typeof npc.personality_traits === 'string') {
-                    personalityTraits = npc.personality_traits.split(',').map(t => t.trim()).filter(t => t);
-                } else if (Array.isArray(npc.personality_traits)) {
-                    personalityTraits = npc.personality_traits;
+                // Handle personality traits only if unlocked
+                if (!lockedFields.personalityTraits) {
+                    if (typeof npc.personality_traits === 'string') {
+                        personalityTraits = npc.personality_traits.split(',').map(t => t.trim()).filter(t => t);
+                    } else if (Array.isArray(npc.personality_traits)) {
+                        personalityTraits = npc.personality_traits;
+                    }
+                    
+                    // Ensure we have at least one trait field
+                    if (personalityTraits.length === 0) {
+                        personalityTraits = [''];
+                    }
                 }
                 
-                // Ensure we have at least one trait field
-                if (personalityTraits.length === 0) {
-                    personalityTraits = [''];
-                }
-                
-                ideals = npc.ideals || '';
-                bonds = npc.bonds || '';
-                flaws = npc.flaws || '';
-                appearanceDescription = npc.appearance || '';
-                background = npc.background || '';
-                voiceDescription = npc.voice_mannerisms || '';
-                notes = npc.notes || '';
+                if (!lockedFields.ideals) ideals = npc.ideals || '';
+                if (!lockedFields.bonds) bonds = npc.bonds || '';
+                if (!lockedFields.flaws) flaws = npc.flaws || '';
+                if (!lockedFields.appearanceDescription) appearanceDescription = npc.appearance || '';
+                if (!lockedFields.background) background = npc.background || '';
+                if (!lockedFields.voiceDescription) voiceDescription = npc.voice_mannerisms || '';
+                if (!lockedFields.notes) notes = npc.notes || '';
                 
                 // Show success message if there was a warning
                 if (response.warning) {
@@ -209,14 +246,30 @@
                         
                         <div class="space-y-4">
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-300 mb-2">
-                                    Name <span class="text-red-400">*</span>
+                                <label for="name" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                    <span>Name <span class="text-red-400">*</span></span>
+                                    <button
+                                        type="button"
+                                        on:click={() => toggleFieldLock('name')}
+                                        class="text-gray-400 hover:text-white transition-colors ml-2"
+                                        title="{lockedFields.name ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                    >
+                                        {#if lockedFields.name}
+                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            </svg>
+                                        {/if}
+                                    </button>
                                 </label>
                                 <input
                                     id="name"
                                     type="text"
                                     bind:value={name}
-                                    class="input w-full"
+                                    class="input w-full {lockedFields.name ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                     placeholder="Enter NPC name"
                                     required
                                 />
@@ -224,14 +277,30 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="race" class="block text-sm font-medium text-gray-300 mb-2">
-                                        Race
+                                    <label for="race" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                        <span>Race</span>
+                                        <button
+                                            type="button"
+                                            on:click={() => toggleFieldLock('race')}
+                                            class="text-gray-400 hover:text-white transition-colors ml-2"
+                                            title="{lockedFields.race ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                        >
+                                            {#if lockedFields.race}
+                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                            {:else}
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                </svg>
+                                            {/if}
+                                        </button>
                                     </label>
                                     <input
                                         id="race"
                                         type="text"
                                         bind:value={race}
-                                        class="input w-full"
+                                        class="input w-full {lockedFields.race ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                         placeholder="e.g., Human, Elf"
                                     />
                                 </div>
@@ -264,14 +333,30 @@
                                     />
                                 </div>
                                 <div>
-                                    <label for="occupation" class="block text-sm font-medium text-gray-300 mb-2">
-                                        Occupation
+                                    <label for="occupation" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                        <span>Occupation</span>
+                                        <button
+                                            type="button"
+                                            on:click={() => toggleFieldLock('occupation')}
+                                            class="text-gray-400 hover:text-white transition-colors ml-2"
+                                            title="{lockedFields.occupation ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
+                                        >
+                                            {#if lockedFields.occupation}
+                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                                </svg>
+                                            {:else}
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                </svg>
+                                            {/if}
+                                        </button>
                                     </label>
                                     <input
                                         id="occupation"
                                         type="text"
                                         bind:value={occupation}
-                                        class="input w-full"
+                                        class="input w-full {lockedFields.occupation ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                         placeholder="e.g., Blacksmith, Noble"
                                     />
                                 </div>

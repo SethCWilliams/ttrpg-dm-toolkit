@@ -117,11 +117,8 @@ Choose an appropriate height for the character's race."""
                     
                     import re
                     
-                    # Fix age field if it has "years old" text
-                    original_age = cleaned_response
-                    cleaned_response = re.sub(r'"age":\s*"(\d+)\s+years?\s+old"', r'"age": \1', cleaned_response)
-                    if original_age != cleaned_response:
-                        print("FIXED: Removed 'years old' from age field")
+                    # Fix age field - extract only the numeric value
+                    cleaned_response = re.sub(r'"age":\s*"([^"]*?(\d+)[^"]*?)"', r'"age": \2', cleaned_response)
                     
                     # Check if JSON ends with closing brace
                     if not cleaned_response.endswith('}'):

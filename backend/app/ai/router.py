@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Dict, Any, Optional
+from pydantic import BaseModel
 from app.database import get_db
 from app.models import Campaign, User
 from app.auth.router import get_current_user
 from .generators import NPCGenerator
 from .service import ai_manager
+
+class GenerateNPCRequest(BaseModel):
+    locked_fields: Optional[Dict[str, Any]] = {}
 
 router = APIRouter()
 
@@ -28,6 +32,7 @@ async def get_ai_status():
 @router.post("/generate/npc/{campaign_id}")
 async def generate_npc(
     campaign_id: int,
+    request: GenerateNPCRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
@@ -57,8 +62,8 @@ async def generate_npc(
         # existing_locations = db.query(Location).filter(Location.campaign_id == campaign_id).all()
         # campaign_context['existing_locations'] = [loc.name for loc in existing_locations]
         
-        # Generate the NPC
-        npc_data = await NPCGenerator.generate_npc(campaign_context)
+        # Generate the NPC with locked field constraints
+        npc_data = await NPCGenerator.generate_npc(campaign_context, request.locked_fields)
         
         return {
             "success": True,

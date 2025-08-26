@@ -6,7 +6,7 @@ class NPCGenerator:
     """NPC generation using AI services"""
     
     @staticmethod
-    def _build_npc_prompt(campaign_context: Optional[Dict] = None) -> str:
+    def _build_npc_prompt(campaign_context: Optional[Dict] = None, locked_fields: Optional[Dict] = None) -> str:
         """Build a comprehensive NPC generation prompt"""
         
         base_prompt = """You are a creative dungeon master creating a new NPC for a tabletop RPG campaign. Generate a detailed, interesting NPC with the following information. Return the response as valid JSON with exactly these fields:
@@ -40,10 +40,21 @@ IMPORTANT:
 - Ensure all JSON arrays are properly closed with ]
 - Ensure all JSON objects are properly closed with }
 - Use proper JSON syntax with double quotes around all strings
-- AVOID using quotes within string values - use alternative descriptions (e.g., "5 feet 8 inches tall" instead of "5'8"")
-- For measurements, use words instead of symbols (e.g., "five feet eight inches" or "5 feet 8 inches")
+- AVOID using quotes within string values - use alternative descriptions
+- For units of measurement, use words instead of symbols
 
-Create a unique, memorable character that would fit well in a fantasy setting. Make them interesting with clear motivations, flaws, and potential for interesting interactions with player characters. Avoid generic stereotypes and give them personality depth."""
+Create a unique, memorable character that would fit well in a fantasy setting. Make them interesting with clear motivations, flaws, and potential for interesting interactions with player characters. Avoid generic stereotypes and give them personality depth.
+
+CRITICAL: Ensure your response is complete and ends with a closing brace }."""
+
+        # Add locked field constraints
+        if locked_fields and any(locked_fields.values()):
+            constraints_info = "\n\nIMPORTANT CONSTRAINTS - Use these EXACT values for the specified fields:\n"
+            for field, value in locked_fields.items():
+                if value:  # Only add non-empty constraints
+                    constraints_info += f"- {field}: {value}\n"
+            constraints_info += "\nGenerate the remaining fields to work well with these locked values. Make sure the character is cohesive and the unlocked fields complement the locked ones."
+            base_prompt += constraints_info
 
         # Add campaign context if provided
         if campaign_context:
@@ -59,20 +70,40 @@ Create a unique, memorable character that would fit well in a fantasy setting. M
         
         base_prompt += "\n\nIMPORTANT: Return ONLY valid JSON, no additional text or formatting."
         
+        # Add race-appropriate height guidance
+        base_prompt += """
+
+HEIGHT GUIDANCE BY RACE:
+- Dwarves: typically three to four feet tall
+- Halflings: typically three to four feet tall  
+- Gnomes: typically three to four feet tall
+- Goblins: typically three to four feet tall
+- Kobolds: typically two to three feet tall
+- Goliaths: typically seven to eight feet tall
+- Orcs: typically six to seven feet tall
+- Half-Orcs: typically five to six feet tall
+- Dragonborn: typically six to seven feet tall
+- Tieflings: typically five to six feet tall
+- Humans: typically five to six feet tall
+- Elves: typically five to six feet tall
+- Half-Elves: typically five to six feet tall
+
+Choose an appropriate height for the character's race."""
+        
         return base_prompt
     
     @staticmethod
-    async def generate_npc(campaign_context: Optional[Dict] = None) -> Dict[str, Any]:
+    async def generate_npc(campaign_context: Optional[Dict] = None, locked_fields: Optional[Dict] = None) -> Dict[str, Any]:
         """Generate a complete NPC using AI"""
         
         try:
-            prompt = NPCGenerator._build_npc_prompt(campaign_context)
+            prompt = NPCGenerator._build_npc_prompt(campaign_context, locked_fields)
             
             # Generate the NPC using AI
             response = await ai_manager.generate_text(
                 prompt,
                 temperature=0.8,  # Higher creativity
-                max_tokens=1000   # Reduced to avoid truncation
+                max_tokens=1500   # Increased to ensure complete responses
             )
             
             # Parse JSON response
@@ -81,11 +112,38 @@ Create a unique, memorable character that would fit well in a fantasy setting. M
                 
                 # Try to parse the raw response directly
                 try:
-                    # Ensure the JSON ends with a closing brace
+                    # Clean up common JSON issues
                     cleaned_response = response.strip()
-                    if not cleaned_response.endswith('}'):
-                        cleaned_response = cleaned_response.rstrip() + '}'
                     
+                    import re
+                    
+                    # Fix age field if it has "years old" text
+                    original_age = cleaned_response
+                    cleaned_response = re.sub(r'"age":\s*"(\d+)\s+years?\s+old"', r'"age": \1', cleaned_response)
+                    if original_age != cleaned_response:
+                        print("FIXED: Removed 'years old' from age field")
+                    
+                    # Check if JSON ends with closing brace
+                    if not cleaned_response.endswith('}'):
+                        print(f"FIXING: Response doesn't end with }}. Adding closing brace.")
+                        cleaned_response = cleaned_response.rstrip() + '}'
+                    else:
+                        print("✓ Response already ends with closing brace")
+                    
+                    # Count braces to ensure we have a complete JSON object
+                    open_braces = cleaned_response.count('{')
+                    close_braces = cleaned_response.count('}')
+                    print(f"Braces count: {{ = {open_braces}, }} = {close_braces}")
+                    
+                    if open_braces > close_braces:
+                        missing_braces = open_braces - close_braces
+                        print(f"FIXING: Missing {missing_braces} closing braces. Adding them.")
+                        cleaned_response += '}' * missing_braces
+                    else:
+                        print("✓ Brace count is balanced")
+                    
+                    print(f"Final cleaned response length: {len(cleaned_response)}")
+                    print(f"Final ends with: ...{cleaned_response[-50:]}")
                     npc_data = json.loads(cleaned_response)
                 except json.JSONDecodeError as e:
                     print(f"JSON parsing failed: {e}")
@@ -96,7 +154,7 @@ Create a unique, memorable character that would fit well in a fantasy setting. M
                 required_fields = {
                     'name': 'Unknown Traveler',
                     'race': 'Human',
-                    'gender': 'Non-binary',
+                    'gender': 'Male',
                     'age': 30,
                     'occupation': 'Wanderer',
                     'location': 'The local tavern',
@@ -151,7 +209,7 @@ Create a unique, memorable character that would fit well in a fantasy setting. M
         return {
             'name': 'Mysterious Stranger',
             'race': 'Human',
-            'gender': 'Non-binary',
+            'gender': 'Male',
             'age': 35,
             'occupation': 'Merchant',
             'location': 'The crossroads tavern',

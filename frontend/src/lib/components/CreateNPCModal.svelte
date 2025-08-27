@@ -444,7 +444,7 @@
                                         {/if}
                                     </button>
                                 </label>
-                                {#each personalityTraits as trait, index}
+                                {#each personalityTraits as _, index}
                                     <div class="flex gap-2 mb-2">
                                         <input
                                             type="text"

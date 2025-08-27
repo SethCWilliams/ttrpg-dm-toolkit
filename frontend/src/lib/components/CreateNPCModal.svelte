@@ -254,15 +254,13 @@
                                         class="text-gray-400 hover:text-white transition-colors ml-2"
                                         title="{lockedFields.name ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
                                     >
-                                        {#if lockedFields.name}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-4 w-4 {lockedFields.name ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            {#if lockedFields.name}
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            {:else}
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
+                                            {/if}
+                                        </svg>
                                     </button>
                                 </label>
                                 <input
@@ -285,15 +283,13 @@
                                             class="text-gray-400 hover:text-white transition-colors ml-2"
                                             title="{lockedFields.race ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
                                         >
-                                            {#if lockedFields.race}
-                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="h-4 w-4 {lockedFields.race ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {#if lockedFields.race}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                </svg>
-                                            {:else}
-                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {:else}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                </svg>
-                                            {/if}
+                                                {/if}
+                                            </svg>
                                         </button>
                                     </label>
                                     <input
@@ -313,15 +309,13 @@
                                             class="text-gray-400 hover:text-white transition-colors ml-2"
                                             title="{lockedFields.gender ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
                                         >
-                                            {#if lockedFields.gender}
-                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="h-4 w-4 {lockedFields.gender ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {#if lockedFields.gender}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                </svg>
-                                            {:else}
-                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {:else}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                </svg>
-                                            {/if}
+                                                {/if}
+                                            </svg>
                                         </button>
                                     </label>
                                     <input
@@ -344,15 +338,13 @@
                                             class="text-gray-400 hover:text-white transition-colors ml-2"
                                             title="{lockedFields.age ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
                                         >
-                                            {#if lockedFields.age}
-                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="h-4 w-4 {lockedFields.age ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {#if lockedFields.age}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                </svg>
-                                            {:else}
-                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {:else}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                </svg>
-                                            {/if}
+                                                {/if}
+                                            </svg>
                                         </button>
                                     </label>
                                     <input
@@ -373,15 +365,13 @@
                                             class="text-gray-400 hover:text-white transition-colors ml-2"
                                             title="{lockedFields.occupation ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
                                         >
-                                            {#if lockedFields.occupation}
-                                                <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="h-4 w-4 {lockedFields.occupation ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {#if lockedFields.occupation}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                </svg>
-                                            {:else}
-                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                {:else}
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                </svg>
-                                            {/if}
+                                                {/if}
+                                            </svg>
                                         </button>
                                     </label>
                                     <input
@@ -403,15 +393,13 @@
                                         class="text-gray-400 hover:text-white transition-colors ml-2"
                                         title="{lockedFields.location ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
                                     >
-                                        {#if lockedFields.location}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-4 w-4 {lockedFields.location ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            {#if lockedFields.location}
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            {:else}
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
+                                            {/if}
+                                        </svg>
                                     </button>
                                 </label>
                                 <select
@@ -448,7 +436,7 @@
                                             </svg>
                                         {:else}
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                                             </svg>
                                         {/if}
                                     </button>
@@ -593,7 +581,7 @@
                                             </svg>
                                         {:else}
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                                             </svg>
                                         {/if}
                                     </button>
@@ -622,7 +610,7 @@
                                             </svg>
                                         {:else}
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                                             </svg>
                                         {/if}
                                     </button>
@@ -651,7 +639,7 @@
                                             </svg>
                                         {:else}
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                                             </svg>
                                         {/if}
                                     </button>
@@ -719,7 +707,7 @@
                                         </svg>
                                     {:else}
                                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
                                         </svg>
                                     {/if}
                                 </button>

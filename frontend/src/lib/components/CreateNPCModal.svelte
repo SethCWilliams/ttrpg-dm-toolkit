@@ -94,6 +94,9 @@
             if (lockedFields.appearanceDescription && appearanceDescription.trim()) lockedData.appearance = appearanceDescription.trim();
             if (lockedFields.voiceDescription && voiceDescription.trim()) lockedData.voice_mannerisms = voiceDescription.trim();
             if (lockedFields.notes && notes.trim()) lockedData.notes = notes.trim();
+            if (lockedFields.personalityTraits && personalityTraits.some(trait => trait.trim())) {
+                lockedData.personality_traits = personalityTraits.filter(trait => trait.trim()).join(', ');
+            }
             
             const response = await aiAPI.generateNPC(campaignId, lockedData);
             
@@ -445,7 +448,7 @@
                                     <div class="flex gap-2 mb-2">
                                         <input
                                             type="text"
-                                            bind:value={trait}
+                                            bind:value={personalityTraits[index]}
                                             class="input flex-1 {lockedFields.personalityTraits ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                             placeholder="e.g., Friendly, Suspicious"
                                         />

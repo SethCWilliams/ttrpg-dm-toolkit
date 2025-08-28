@@ -39,7 +39,6 @@
         age: false,
         occupation: false,
         location: false,
-        personalityTraits: false,
         ideals: false,
         bonds: false,
         flaws: false,
@@ -94,9 +93,6 @@
             if (lockedFields.appearanceDescription && appearanceDescription.trim()) lockedData.appearance = appearanceDescription.trim();
             if (lockedFields.voiceDescription && voiceDescription.trim()) lockedData.voice_mannerisms = voiceDescription.trim();
             if (lockedFields.notes && notes.trim()) lockedData.notes = notes.trim();
-            if (lockedFields.personalityTraits && personalityTraits.some(trait => trait.trim())) {
-                lockedData.personality_traits = personalityTraits.filter(trait => trait.trim()).join(', ');
-            }
             
             const response = await aiAPI.generateNPC(campaignId, lockedData);
             
@@ -110,18 +106,16 @@
                 if (!lockedFields.age) age = npc.age?.toString() || '';
                 if (!lockedFields.occupation) occupation = npc.occupation || '';
                 
-                // Handle personality traits only if unlocked
-                if (!lockedFields.personalityTraits) {
-                    if (typeof npc.personality_traits === 'string') {
-                        personalityTraits = npc.personality_traits.split(',').map(t => t.trim()).filter(t => t);
-                    } else if (Array.isArray(npc.personality_traits)) {
-                        personalityTraits = npc.personality_traits;
-                    }
-                    
-                    // Ensure we have at least one trait field
-                    if (personalityTraits.length === 0) {
-                        personalityTraits = [''];
-                    }
+                // Handle personality traits - always update since not locked
+                if (typeof npc.personality_traits === 'string') {
+                    personalityTraits = npc.personality_traits.split(',').map(t => t.trim()).filter(t => t);
+                } else if (Array.isArray(npc.personality_traits)) {
+                    personalityTraits = npc.personality_traits;
+                }
+                
+                // Ensure we have at least one trait field
+                if (personalityTraits.length === 0) {
+                    personalityTraits = [''];
                 }
                 
                 if (!lockedFields.ideals) ideals = npc.ideals || '';
@@ -425,31 +419,15 @@
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
-                                    <span>Personality Traits</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('personalityTraits')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.personalityTraits ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        {#if lockedFields.personalityTraits}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
-                                    </button>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">
+                                    Personality Traits
                                 </label>
                                 {#each personalityTraits as _, index}
                                     <div class="flex gap-2 mb-2">
                                         <input
                                             type="text"
                                             bind:value={personalityTraits[index]}
-                                            class="input flex-1 {lockedFields.personalityTraits ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
+                                            class="input flex-1"
                                             placeholder="e.g., Friendly, Suspicious"
                                         />
                                         {#if personalityTraits.length > 1}

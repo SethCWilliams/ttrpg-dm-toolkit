@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher, onMount } from 'svelte';
-    import { locationAPI } from '$lib/api.js';
+    import { locationAPI, aiAPI } from '$lib/api.js';
+    import FieldLockButton from './FieldLockButton.svelte';
 
     export let campaignId;
     export let availableParents = [];
@@ -9,6 +10,7 @@
 
     let loading = false;
     let saving = false;
+    let generatingAI = false;
     let error = '';
     let templates = {};
     let selectedType = '';
@@ -19,6 +21,24 @@
         parent_location_id: null,
         status: 'draft',
         visibility: 'dm_only'
+    };
+
+    // Field locking for AI generation
+    let lockedFields = {
+        name: false,
+        description: false,
+        history: false,
+        population: false,
+        demographics: false,
+        government_type: false,
+        economic_status: false,
+        notable_features: false,
+        current_events: false,
+        defenses: false,
+        trade_goods: false,
+        connected_locations: false,
+        ambient_description: false,
+        notes: false
     };
 
     const locationTypes = [
@@ -129,53 +149,116 @@
         dispatch('close');
     }
 
-    function renderField(fieldName, fieldConfig) {
-        const value = formData[fieldName] || '';
-        
-        switch (fieldConfig.type) {
-            case 'text':
-            case 'number':
-                return `<input 
-                    type="${fieldConfig.type}" 
-                    bind:value={formData.${fieldName}} 
-                    class="input w-full" 
-                    placeholder="${fieldConfig.label}"
-                    ${fieldConfig.required ? 'required' : ''}
-                />`;
+    function toggleFieldLock(fieldName) {
+        lockedFields[fieldName] = !lockedFields[fieldName];
+    }
+
+    async function generateRandomLocation() {
+        if (!selectedType) {
+            error = 'Please select a location type first';
+            return;
+        }
+
+        try {
+            generatingAI = true;
+            error = '';
             
-            case 'textarea':
-                return `<textarea 
-                    bind:value={formData.${fieldName}} 
-                    rows="3" 
-                    class="input w-full resize-y" 
-                    placeholder="${fieldConfig.label}..."
-                ></textarea>`;
+            // Build locked data from current form values
+            const lockedData = {};
             
-            case 'select':
-                return fieldConfig.options ? 
-                    `<select bind:value={formData.${fieldName}} class="input w-full">
-                        <option value="">Select ${fieldConfig.label}...</option>
-                        ${fieldConfig.options.map(option => 
-                            `<option value="${option}">${option.replace('_', ' ')}</option>`
-                        ).join('')}
-                    </select>` : '';
+            if (lockedFields.name && formData.name?.trim()) lockedData.name = formData.name.trim();
+            if (lockedFields.description && formData.description?.trim()) lockedData.description = formData.description.trim();
+            if (lockedFields.history && formData.history?.trim()) lockedData.history = formData.history.trim();
+            if (lockedFields.population && formData.population) lockedData.population = formData.population;
+            if (lockedFields.demographics && formData.demographics?.trim()) lockedData.demographics = formData.demographics.trim();
+            if (lockedFields.government_type && formData.government_type?.trim()) lockedData.government_type = formData.government_type.trim();
+            if (lockedFields.economic_status && formData.economic_status?.trim()) lockedData.economic_status = formData.economic_status.trim();
+            if (lockedFields.notable_features && formData.notable_features?.trim()) lockedData.notable_features = formData.notable_features.trim();
+            if (lockedFields.current_events && formData.current_events?.trim()) lockedData.current_events = formData.current_events.trim();
+            if (lockedFields.defenses && formData.defenses?.trim()) lockedData.defenses = formData.defenses.trim();
+            if (lockedFields.trade_goods && formData.trade_goods?.trim()) lockedData.trade_goods = formData.trade_goods.trim();
+            if (lockedFields.connected_locations && formData.connected_locations?.trim()) lockedData.connected_locations = formData.connected_locations.trim();
+            if (lockedFields.ambient_description && formData.ambient_description?.trim()) lockedData.ambient_description = formData.ambient_description.trim();
+            if (lockedFields.notes && formData.notes?.trim()) lockedData.notes = formData.notes.trim();
             
-            case 'tags':
-                return 'tags'; // Special handling in template
+            const response = await aiAPI.generateLocation(campaignId, selectedType, lockedData);
             
-            case 'demographics':
-                return 'demographics'; // Special handling in template
+            if (response.success && response.location) {
+                // Update only unlocked fields with AI-generated data
+                // Common fields for all types
+                if (!lockedFields.name) formData.name = response.location.name || '';
+                if (!lockedFields.description) formData.description = response.location.description || '';
+                if (!lockedFields.history) formData.history = response.location.history || '';
+                if (!lockedFields.notable_features) formData.notable_features = response.location.notable_features || '';
+                
+                // Type-specific field mappings
+                if (selectedType === 'structure') {
+                    if (!lockedFields.structure_type) formData.structure_type = response.location.structure_type || '';
+                    if (!lockedFields.owner) formData.owner = response.location.owner || '';
+                    if (!lockedFields.services) formData.services = response.location.services || '';
+                    if (!lockedFields.security) formData.security = response.location.security || '';
+                    if (!lockedFields.ambient_description) formData.ambient_description = response.location.ambient_description || '';
+                } else if (selectedType === 'settlement') {
+                    if (!lockedFields.population) formData.population = response.location.population || 0;
+                    if (!lockedFields.demographics) formData.demographics = response.location.demographics || '';
+                    if (!lockedFields.government_type) formData.government_type = response.location.government_type || '';
+                    if (!lockedFields.economic_status) formData.economic_status = response.location.economic_status || '';
+                    if (!lockedFields.defenses) formData.defenses = response.location.defenses || '';
+                    if (!lockedFields.trade_goods) formData.trade_goods = response.location.trade_goods || '';
+                } else if (selectedType === 'dungeon') {
+                    if (!lockedFields.dungeon_type) formData.dungeon_type = response.location.dungeon_type || '';
+                    if (!lockedFields.difficulty) formData.difficulty = response.location.difficulty || '';
+                    if (!lockedFields.defenses) formData.defenses = response.location.defenses || '';
+                    if (!lockedFields.treasures) formData.treasures = response.location.treasures || '';
+                    if (!lockedFields.ambient_description) formData.ambient_description = response.location.ambient_description || '';
+                } else if (selectedType === 'wilderness') {
+                    if (!lockedFields.terrain_type) formData.terrain_type = response.location.terrain_type || '';
+                    if (!lockedFields.climate) formData.climate = response.location.climate || '';
+                    if (!lockedFields.dangers) formData.dangers = response.location.dangers || '';
+                    if (!lockedFields.resources) formData.resources = response.location.resources || '';
+                    if (!lockedFields.wildlife) formData.wildlife = response.location.wildlife || '';
+                    if (!lockedFields.ambient_description) formData.ambient_description = response.location.ambient_description || '';
+                } else if (selectedType === 'region') {
+                    if (!lockedFields.population) formData.population = response.location.population || 0;
+                    if (!lockedFields.government_type) formData.government_type = response.location.government_type || '';
+                    if (!lockedFields.economic_status) formData.economic_status = response.location.economic_status || '';
+                    if (!lockedFields.climate) formData.climate = response.location.climate || '';
+                    if (!lockedFields.natural_resources) formData.natural_resources = response.location.natural_resources || '';
+                }
+                
+                if (response.warning) {
+                    error = response.warning;
+                }
+            } else {
+                throw new Error('Failed to generate location data');
+            }
             
-            default:
-                return '';
+        } catch (err) {
+            error = err.message || 'Failed to generate location. Please try again.';
+        } finally {
+            generatingAI = false;
         }
     }
+
 </script>
 
 <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
     <div class="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b border-gray-700">
+        <div class="p-6 border-b border-gray-700 flex justify-between items-center">
             <h2 class="text-2xl font-semibold text-white">Create New Location</h2>
+            <button 
+                type="button"
+                on:click={generateRandomLocation}
+                disabled={generatingAI || !selectedType}
+                class="btn btn-secondary {generatingAI ? 'opacity-50' : ''}"
+                title="Generate location details using AI"
+            >
+                {#if generatingAI}
+                    Generating...
+                {:else}
+                    Randomize
+                {/if}
+            </button>
         </div>
         
         <div class="p-6">
@@ -195,13 +278,18 @@
                     <!-- Basic Information -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">
-                                Name <span class="text-red-400">*</span>
+                            <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                <span>Name <span class="text-red-400">*</span></span>
+                                <FieldLockButton 
+                                    isLocked={lockedFields.name} 
+                                    fieldName="name"
+                                    on:toggle={() => toggleFieldLock('name')} 
+                                />
                             </label>
                             <input
                                 type="text"
                                 bind:value={formData.name}
-                                class="input w-full"
+                                class="input w-full {lockedFields.name ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                 placeholder="Location name"
                                 required
                             />
@@ -254,10 +342,19 @@
                                 {#each Object.entries(currentTemplate) as [fieldName, fieldConfig]}
                                     {#if fieldName !== 'name'} <!-- Skip name since it's handled above -->
                                         <div class="{fieldConfig.type === 'textarea' || fieldConfig.type === 'tags' ? 'md:col-span-2' : ''}">
-                                            <label class="block text-sm font-medium text-gray-300 mb-2">
-                                                {fieldConfig.label}
-                                                {#if fieldConfig.required}
-                                                    <span class="text-red-400">*</span>
+                                            <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
+                                                <span>
+                                                    {fieldConfig.label}
+                                                    {#if fieldConfig.required}
+                                                        <span class="text-red-400">*</span>
+                                                    {/if}
+                                                </span>
+                                                {#if lockedFields.hasOwnProperty(fieldName)}
+                                                    <FieldLockButton 
+                                                        isLocked={lockedFields[fieldName]} 
+                                                        fieldName={fieldName}
+                                                        on:toggle={() => toggleFieldLock(fieldName)} 
+                                                    />
                                                 {/if}
                                             </label>
                                             
@@ -265,7 +362,7 @@
                                                 <input
                                                     type="text"
                                                     bind:value={formData[fieldName]}
-                                                    class="input w-full"
+                                                    class="input w-full {lockedFields[fieldName] ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                                     placeholder={fieldConfig.label}
                                                     required={fieldConfig.required}
                                                 />
@@ -273,7 +370,7 @@
                                                 <input
                                                     type="number"
                                                     bind:value={formData[fieldName]}
-                                                    class="input w-full"
+                                                    class="input w-full {lockedFields[fieldName] ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                                     placeholder={fieldConfig.label}
                                                     required={fieldConfig.required}
                                                 />
@@ -281,12 +378,12 @@
                                                 <textarea
                                                     bind:value={formData[fieldName]}
                                                     rows="3"
-                                                    class="input w-full resize-y"
+                                                    class="input w-full resize-y {lockedFields[fieldName] ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}"
                                                     placeholder={fieldConfig.label + "..."}
                                                     required={fieldConfig.required}
                                                 ></textarea>
                                             {:else if fieldConfig.type === 'select'}
-                                                <select bind:value={formData[fieldName]} class="input w-full" required={fieldConfig.required}>
+                                                <select bind:value={formData[fieldName]} class="input w-full {lockedFields[fieldName] ? 'border-yellow-400 bg-yellow-50 bg-opacity-10' : ''}" required={fieldConfig.required}>
                                                     <option value="">Select {fieldConfig.label}...</option>
                                                     {#each fieldConfig.options as option}
                                                         <option value={option}>{option.replace('_', ' ')}</option>

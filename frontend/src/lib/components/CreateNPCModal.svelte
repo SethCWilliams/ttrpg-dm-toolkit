@@ -2,6 +2,7 @@
     import { createEventDispatcher } from 'svelte';
     import { npcAPI, locationAPI, aiAPI } from '$lib/api.js';
     import { onMount } from 'svelte';
+    import FieldLockButton from './FieldLockButton.svelte';
 
     export let campaignId;
 
@@ -245,20 +246,11 @@
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Name <span class="text-red-400">*</span></span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('name')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.name ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        <svg class="h-4 w-4 {lockedFields.name ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            {#if lockedFields.name}
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            {:else}
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            {/if}
-                                        </svg>
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.name} 
+                                        fieldName="name"
+                                        on:toggle={() => toggleFieldLock('name')} 
+                                    />
                                 </label>
                                 <input
                                     id="name"
@@ -274,20 +266,11 @@
                                 <div>
                                     <label for="race" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                         <span>Race</span>
-                                        <button
-                                            type="button"
-                                            on:click={() => toggleFieldLock('race')}
-                                            class="text-gray-400 hover:text-white transition-colors ml-2"
-                                            title="{lockedFields.race ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                        >
-                                            <svg class="h-4 w-4 {lockedFields.race ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                {#if lockedFields.race}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                {:else}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                {/if}
-                                            </svg>
-                                        </button>
+                                        <FieldLockButton 
+                                            isLocked={lockedFields.race} 
+                                            fieldName="race"
+                                            on:toggle={() => toggleFieldLock('race')} 
+                                        />
                                     </label>
                                     <input
                                         id="race"
@@ -300,20 +283,11 @@
                                 <div>
                                     <label for="gender" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                         <span>Gender</span>
-                                        <button
-                                            type="button"
-                                            on:click={() => toggleFieldLock('gender')}
-                                            class="text-gray-400 hover:text-white transition-colors ml-2"
-                                            title="{lockedFields.gender ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                        >
-                                            <svg class="h-4 w-4 {lockedFields.gender ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                {#if lockedFields.gender}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                {:else}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                {/if}
-                                            </svg>
-                                        </button>
+                                        <FieldLockButton 
+                                            isLocked={lockedFields.gender} 
+                                            fieldName="gender"
+                                            on:toggle={() => toggleFieldLock('gender')} 
+                                        />
                                     </label>
                                     <input
                                         id="gender"
@@ -329,20 +303,11 @@
                                 <div>
                                     <label for="age" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                         <span>Age</span>
-                                        <button
-                                            type="button"
-                                            on:click={() => toggleFieldLock('age')}
-                                            class="text-gray-400 hover:text-white transition-colors ml-2"
-                                            title="{lockedFields.age ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                        >
-                                            <svg class="h-4 w-4 {lockedFields.age ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                {#if lockedFields.age}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                {:else}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                {/if}
-                                            </svg>
-                                        </button>
+                                        <FieldLockButton 
+                                            isLocked={lockedFields.age} 
+                                            fieldName="age"
+                                            on:toggle={() => toggleFieldLock('age')} 
+                                        />
                                     </label>
                                     <input
                                         id="age"
@@ -356,20 +321,11 @@
                                 <div>
                                     <label for="occupation" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                         <span>Occupation</span>
-                                        <button
-                                            type="button"
-                                            on:click={() => toggleFieldLock('occupation')}
-                                            class="text-gray-400 hover:text-white transition-colors ml-2"
-                                            title="{lockedFields.occupation ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                        >
-                                            <svg class="h-4 w-4 {lockedFields.occupation ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                {#if lockedFields.occupation}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                                {:else}
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                                {/if}
-                                            </svg>
-                                        </button>
+                                        <FieldLockButton 
+                                            isLocked={lockedFields.occupation} 
+                                            fieldName="occupation"
+                                            on:toggle={() => toggleFieldLock('occupation')} 
+                                        />
                                     </label>
                                     <input
                                         id="occupation"
@@ -384,20 +340,11 @@
                             <div>
                                 <label for="location" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Location</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('location')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.location ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        <svg class="h-4 w-4 {lockedFields.location ? 'text-yellow-400' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            {#if lockedFields.location}
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            {:else}
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            {/if}
-                                        </svg>
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.location} 
+                                        fieldName="location"
+                                        on:toggle={() => toggleFieldLock('location')} 
+                                    />
                                 </label>
                                 <select
                                     id="location"
@@ -453,22 +400,11 @@
                             <div>
                                 <label for="ideals" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Ideals</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('ideals')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.ideals ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        {#if lockedFields.ideals}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.ideals} 
+                                        fieldName="ideals"
+                                        on:toggle={() => toggleFieldLock('ideals')} 
+                                    />
                                 </label>
                                 <textarea
                                     id="ideals"
@@ -482,22 +418,11 @@
                             <div>
                                 <label for="bonds" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Bonds</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('bonds')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.bonds ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        {#if lockedFields.bonds}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.bonds} 
+                                        fieldName="bonds"
+                                        on:toggle={() => toggleFieldLock('bonds')} 
+                                    />
                                 </label>
                                 <textarea
                                     id="bonds"
@@ -511,22 +436,11 @@
                             <div>
                                 <label for="flaws" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Flaws</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('flaws')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.flaws ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        {#if lockedFields.flaws}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.flaws} 
+                                        fieldName="flaws"
+                                        on:toggle={() => toggleFieldLock('flaws')} 
+                                    />
                                 </label>
                                 <textarea
                                     id="flaws"
@@ -550,22 +464,11 @@
                             <div>
                                 <label for="appearance" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Appearance</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('appearanceDescription')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.appearanceDescription ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        {#if lockedFields.appearanceDescription}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.appearanceDescription} 
+                                        fieldName="appearance"
+                                        on:toggle={() => toggleFieldLock('appearanceDescription')} 
+                                    />
                                 </label>
                                 <textarea
                                     id="appearance"
@@ -579,22 +482,11 @@
                             <div>
                                 <label for="voice" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Voice & Mannerisms</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('voiceDescription')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.voiceDescription ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        {#if lockedFields.voiceDescription}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.voiceDescription} 
+                                        fieldName="voice"
+                                        on:toggle={() => toggleFieldLock('voiceDescription')} 
+                                    />
                                 </label>
                                 <textarea
                                     id="voice"
@@ -608,22 +500,11 @@
                             <div>
                                 <label for="background" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                     <span>Background</span>
-                                    <button
-                                        type="button"
-                                        on:click={() => toggleFieldLock('background')}
-                                        class="text-gray-400 hover:text-white transition-colors ml-2"
-                                        title="{lockedFields.background ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                    >
-                                        {#if lockedFields.background}
-                                            <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        {:else}
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                            </svg>
-                                        {/if}
-                                    </button>
+                                    <FieldLockButton 
+                                        isLocked={lockedFields.background} 
+                                        fieldName="background"
+                                        on:toggle={() => toggleFieldLock('background')} 
+                                    />
                                 </label>
                                 <textarea
                                     id="background"
@@ -676,22 +557,11 @@
                         <div>
                             <label for="notes" class="block text-sm font-medium text-gray-300 mb-2 flex items-center justify-between">
                                 <span>Notes</span>
-                                <button
-                                    type="button"
-                                    on:click={() => toggleFieldLock('notes')}
-                                    class="text-gray-400 hover:text-white transition-colors ml-2"
-                                    title="{lockedFields.notes ? 'Unlock field (will be randomized)' : 'Lock field (keep current value)'}"
-                                >
-                                    {#if lockedFields.notes}
-                                        <svg class="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                    {:else}
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                                        </svg>
-                                    {/if}
-                                </button>
+                                <FieldLockButton 
+                                    isLocked={lockedFields.notes} 
+                                    fieldName="notes"
+                                    on:toggle={() => toggleFieldLock('notes')} 
+                                />
                             </label>
                             <textarea
                                 id="notes"

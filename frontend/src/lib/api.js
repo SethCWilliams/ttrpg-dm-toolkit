@@ -418,6 +418,15 @@ export const aiAPI = {
             body: JSON.stringify({ locked_fields: lockedData })
         });
     },
+    async generateLocation(campaignId, locationType, lockedData = {}) {
+        return apiRequest(`/ai/generate/location/${campaignId}`, {
+            method: 'POST',
+            body: JSON.stringify({ 
+                location_type: locationType,
+                locked_fields: lockedData 
+            })
+        });
+    },
 
     async updateAPIKeys(keys) {
         return apiRequest('/ai/update-keys', {

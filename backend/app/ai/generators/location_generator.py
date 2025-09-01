@@ -40,7 +40,7 @@ class LocationGenerator:
     "name": "building name",
     "description": "detailed description of the building's appearance and atmosphere",
     "history": "background story and historical significance",
-    "structure_type": "building type (inn, tavern, shop, temple, guild_hall, manor, castle, tower, warehouse, other)",
+    "structure_type": "building type - use EXACTLY one of: inn, tavern, shop, temple, guild_hall, manor, castle, tower, warehouse, other",
     "owner": "owner or proprietor name and details",
     "notable_features": ["feature 1", "feature 2", "feature 3"],
     "services": ["service 1", "service 2", "service 3"],
@@ -64,7 +64,7 @@ class LocationGenerator:
     "name": "wilderness area name",
     "description": "detailed description of the natural area's appearance and atmosphere",
     "history": "background story and historical significance",
-    "terrain_type": "terrain type (forest, mountains, plains, desert, swamp, coast, river, lake, hills, other)",
+    "terrain_type": "terrain type - use EXACTLY one of: forest, mountains, plains, desert, swamp, coast, river, lake, hills, other",
     "climate": "weather and climate conditions",
     "dangers": ["natural hazard 1", "threat 2", "danger 3"],
     "notable_features": ["landmark 1", "point of interest 2", "feature 3"],
@@ -104,7 +104,16 @@ class LocationGenerator:
 - Ensure all JSON objects are properly closed with }}
 - Use proper JSON syntax with double quotes around all strings
 - AVOID using quotes within string values - use alternative descriptions
-- Return ONLY the JSON, no additional text"""
+- Return ONLY the JSON, no additional text
+
+FANTASY SETTING REQUIREMENTS:
+- This is a HIGH FANTASY world with magic, wizards, clerics, and fantasy races
+- Use fantasy-appropriate names (avoid real-world cultural references like Ottoman, Arabian, etc.)
+- Consider magical elements: enchanted items, spell components, magical services
+- Fantasy races may be present: humans, elves, dwarves, halflings, gnomes, etc.
+- Include fantasy elements: magical lighting, enchantments, alchemy, divine blessing
+- Use generic fantasy naming conventions rather than specific real-world cultures
+- Think D&D, Lord of the Rings, or generic fantasy rather than historical periods"""
 
         # Add type-specific guidance
         if location_type == 'settlement':
@@ -144,7 +153,11 @@ STRUCTURE-SPECIFIC GUIDANCE:
 - Government_type refers to management or ownership
 - Economic_status refers to the building's wealth or purpose
 - Notable_features should include architectural details and special rooms
-- Consider the structure's purpose and current condition"""
+- Consider the structure's purpose and current condition
+- For taverns/inns: Include fantasy elements like magical warming, enchanted kegs, rooms warded against scrying
+- For shops: Consider what magical items, spell components, or fantasy goods they might sell
+- For temples: Dedicated to fantasy deities, may have clerical magic or divine blessings
+- Use fantasy architectural elements: stone construction, wooden beams, magical lighting"""
         
         elif location_type == 'region':
             base_prompt += """
@@ -381,6 +394,54 @@ REGION-SPECIFIC GUIDANCE:
                         location_data['difficulty'] = 'deadly'
                     else:
                         location_data['difficulty'] = 'moderate'
+            
+            elif location_type == 'structure':
+                if 'structure_type' in location_data:
+                    struct_type = location_data['structure_type'].lower()
+                    if 'inn' in struct_type:
+                        location_data['structure_type'] = 'inn'
+                    elif 'tavern' in struct_type:
+                        location_data['structure_type'] = 'tavern'
+                    elif 'shop' in struct_type or 'store' in struct_type:
+                        location_data['structure_type'] = 'shop'
+                    elif 'temple' in struct_type or 'shrine' in struct_type:
+                        location_data['structure_type'] = 'temple'
+                    elif 'guild' in struct_type:
+                        location_data['structure_type'] = 'guild_hall'
+                    elif 'manor' in struct_type or 'estate' in struct_type:
+                        location_data['structure_type'] = 'manor'
+                    elif 'castle' in struct_type or 'keep' in struct_type:
+                        location_data['structure_type'] = 'castle'
+                    elif 'tower' in struct_type or 'spire' in struct_type:
+                        location_data['structure_type'] = 'tower'
+                    elif 'warehouse' in struct_type or 'storage' in struct_type:
+                        location_data['structure_type'] = 'warehouse'
+                    else:
+                        location_data['structure_type'] = 'other'
+            
+            elif location_type == 'wilderness':
+                if 'terrain_type' in location_data:
+                    terrain = location_data['terrain_type'].lower()
+                    if 'forest' in terrain or 'wood' in terrain:
+                        location_data['terrain_type'] = 'forest'
+                    elif 'mountain' in terrain or 'peak' in terrain:
+                        location_data['terrain_type'] = 'mountains'
+                    elif 'plain' in terrain or 'grassland' in terrain:
+                        location_data['terrain_type'] = 'plains'
+                    elif 'desert' in terrain or 'sand' in terrain:
+                        location_data['terrain_type'] = 'desert'
+                    elif 'swamp' in terrain or 'marsh' in terrain:
+                        location_data['terrain_type'] = 'swamp'
+                    elif 'coast' in terrain or 'shore' in terrain or 'beach' in terrain:
+                        location_data['terrain_type'] = 'coast'
+                    elif 'river' in terrain or 'stream' in terrain:
+                        location_data['terrain_type'] = 'river'
+                    elif 'lake' in terrain or 'pond' in terrain:
+                        location_data['terrain_type'] = 'lake'
+                    elif 'hill' in terrain:
+                        location_data['terrain_type'] = 'hills'
+                    else:
+                        location_data['terrain_type'] = 'other'
             
             return location_data
             

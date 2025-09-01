@@ -25,20 +25,41 @@
 
     // Field locking for AI generation
     let lockedFields = {
+        // Common fields
         name: false,
         description: false,
         history: false,
+        notable_features: false,
+        ambient_description: false,
+        
+        // Settlement fields
         population: false,
         demographics: false,
         government_type: false,
         economic_status: false,
-        notable_features: false,
-        current_events: false,
         defenses: false,
         trade_goods: false,
-        connected_locations: false,
-        ambient_description: false,
-        notes: false
+        
+        // Structure fields  
+        structure_type: false,
+        owner: false,
+        services: false,
+        security: false,
+        
+        // Dungeon fields
+        dungeon_type: false,
+        difficulty: false,
+        treasures: false,
+        
+        // Wilderness fields
+        terrain_type: false,
+        climate: false,
+        dangers: false,
+        wildlife: false,
+        resources: false,
+        
+        // Region fields
+        natural_resources: false
     };
 
     const locationTypes = [
@@ -166,20 +187,17 @@
             // Build locked data from current form values
             const lockedData = {};
             
-            if (lockedFields.name && formData.name?.trim()) lockedData.name = formData.name.trim();
-            if (lockedFields.description && formData.description?.trim()) lockedData.description = formData.description.trim();
-            if (lockedFields.history && formData.history?.trim()) lockedData.history = formData.history.trim();
-            if (lockedFields.population && formData.population) lockedData.population = formData.population;
-            if (lockedFields.demographics && formData.demographics?.trim()) lockedData.demographics = formData.demographics.trim();
-            if (lockedFields.government_type && formData.government_type?.trim()) lockedData.government_type = formData.government_type.trim();
-            if (lockedFields.economic_status && formData.economic_status?.trim()) lockedData.economic_status = formData.economic_status.trim();
-            if (lockedFields.notable_features && formData.notable_features?.trim()) lockedData.notable_features = formData.notable_features.trim();
-            if (lockedFields.current_events && formData.current_events?.trim()) lockedData.current_events = formData.current_events.trim();
-            if (lockedFields.defenses && formData.defenses?.trim()) lockedData.defenses = formData.defenses.trim();
-            if (lockedFields.trade_goods && formData.trade_goods?.trim()) lockedData.trade_goods = formData.trade_goods.trim();
-            if (lockedFields.connected_locations && formData.connected_locations?.trim()) lockedData.connected_locations = formData.connected_locations.trim();
-            if (lockedFields.ambient_description && formData.ambient_description?.trim()) lockedData.ambient_description = formData.ambient_description.trim();
-            if (lockedFields.notes && formData.notes?.trim()) lockedData.notes = formData.notes.trim();
+            // Iterate through all locked fields dynamically
+            Object.keys(lockedFields).forEach(fieldName => {
+                if (lockedFields[fieldName] && formData[fieldName] != null && formData[fieldName] !== '') {
+                    // Handle different field types appropriately
+                    if (typeof formData[fieldName] === 'string') {
+                        lockedData[fieldName] = formData[fieldName].trim();
+                    } else {
+                        lockedData[fieldName] = formData[fieldName];
+                    }
+                }
+            });
             
             const response = await aiAPI.generateLocation(campaignId, selectedType, lockedData);
             
